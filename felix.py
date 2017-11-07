@@ -17,24 +17,7 @@ def printm (text, text_type):
      print_mode = PRINT_MODE
      if (text_type == "a") or ("a" in text_type) or (text_type in print_mode):
           print(text)
-
-def add_frame (title, frame, padding):
-     title_length = len(title)
-     frame_length = title_length + 2 * padding
-     framed_title = "\n"
-     for _ in range(frame_length):
-          framed_title = framed_title + frame
-     framed_title = framed_title + "\n"
-     for _ in range(padding):
-          framed_title = framed_title + "x"
-     framed_title = framed_title + title
-     for _ in range(padding):
-          framed_title = framed_title + "x"
-     framed_title = framed_title + "\n"
-     for _ in range(frame_length):
-          framed_title = framed_title + frame
-     return framed_title
-               
+          
 ### Console Display Set-up ###
 
 fig_unrevealed = "*"
@@ -278,7 +261,9 @@ while (current_round < total_round):
      agent_input = agent_input_template.copy()
      agent_output = agent_output_template.copy()
 
-     printm(add_frame("Round "+str(current_round), "=", 2), "t")
+     printm("\n========", "t")
+     printm(" Round " + str(current_round), "t")
+     printm("========", "t")
      
      agent_input["round"] = current_round
      agent_input["starting_player_index"] = starting_player_index
