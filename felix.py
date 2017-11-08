@@ -1,5 +1,6 @@
 import random
 import ast #ast.literal_eval
+import game_recorder # recording decisions
 
 DASHBOARD = {
      "AGENT_MODE": 0,
@@ -27,7 +28,7 @@ fig_unrevealed = "*"
 fig_arrow = " <<<"
 
 ### Functions ###
-     
+
 # customized print
 def printm (text, text_type):
      global DASHBOARD
@@ -77,7 +78,7 @@ def show_series (series, revealed_length):
           series_list.append(fig_unrevealed)
      return series_list
 
-# output a string containing the rewards information 
+# output a string containing the rewards information
 def  rewards_info (skip_rewards, reward_pointer):
      reward = skip_rewards[reward_pointer]
      output = "Skip Rewards: " + str(skip_rewards) + \
@@ -107,7 +108,7 @@ def player_info_game_over (player):
               " Token: " + str(player["token"]) + \
               " Deck: " + str(show_deck(player["deck"]))
      return output
-          
+
 ### Agent Functions ###
 
 def handler_manual (agent_input, agent_output):
@@ -145,7 +146,7 @@ def handler_manual (agent_input, agent_output):
                else: # insufficient_token
                     print("You don't have enough tokens (" + str(current_player["token"]) + ")!")
                     bid_to_add = input("Please decide the bid to add (input 0 to skip): ")
-                # recompute possible conditions    
+                # recompute possible conditions
                numeric = bid_to_add.isnumeric()
                skip = numeric and (int(bid_to_add) == 0)
                negative_input = numeric and (int(bid_to_add) < 0)
@@ -179,7 +180,7 @@ def handler_random_agent (agent_input, agent_output):
      printm(agent_output, "d")
 
 ### Game ###
-     
+
 def play ():
      global DASHBOARD
      AGENT_MODE = DASHBOARD["AGENT_MODE"]
@@ -257,7 +258,10 @@ def play ():
      for game_play in range(0, NUM_OF_GAME_PLAY):
 
           printm("\n###### GAME PLAY " + str(game_play) + " ######", "g")
-          
+
+          # Data Recorder Set-up #
+          game_recorder.set_recording()
+
           # Game Initiation #
 
           current_round = 0
@@ -286,13 +290,13 @@ def play ():
                agent_input["starting_player_index"] = starting_player_index
 
                # Round Initiation #
-               
+
                central_series = [] # empty the central series
                central_series_revealed_length = 1
                reward_pointer = 0
                current_highest_bid = 0
                current_highest_bidder_index = -1
-               
+
                fleeing_detector = 1 # detect fleeing
                fleeing = False # explanation:
                blanking = False # explanation:
@@ -318,7 +322,7 @@ def play ():
 
                     printm("\n<Player " + str(current_player_index) + "'s Turn>\n", "t")
                     agent_input["my_index"] = current_player_index
-                    
+
                     # information (excluding bid) of all players
                     agent_input["players_public"] = []
                     for i in range(num_of_player):
@@ -329,16 +333,19 @@ def play ():
                          printm("Player " + str(i) + placeholder + "\n" + player_info(players[i]), "i")
                          agent_input["players_public"].append(players[i].copy())
                          del agent_input["players_public"][i]["deck"]
-                  
+
                     printm("\n" + str(show_deck(current_deck)), "i")
                     agent_input["my_deck"] = current_deck
-                    
+
                     if (AGENT_MODE) == 1:
                          handler_random_agent(agent_input, agent_output)
                     else:
                          handler_manual(agent_input, agent_output)
                     card_to_sell = agent_output["card_to_sell"]
-                    
+
+                    # Record the selling decision #
+                    game_recorder.decision_recorder(agent_input, agent_output)
+
                     current_deck[card_to_sell] = False
                     central_series.append(card_to_sell)
 
@@ -352,10 +359,10 @@ def play ():
                current_player_index = starting_player_index - 1
 
                while ( (reward_pointer < num_of_player - 1) or fleeing):
-                    
+
                     if (fleeing):
                          fleeing_loop_terminator = True
-                    
+
                     current_player_index = (current_player_index + 1) % num_of_player
                     current_player = players[current_player_index]
 
@@ -365,7 +372,7 @@ def play ():
                     printm("\n<Player " + str(current_player_index) + "'s Turn>\n", "t")
                     agent_input["my_index"] = current_player_index
                     agent_input["my_deck"] = current_deck
-                    
+
                     # information (including bid) of all players
                     agent_input["players_public"] = []
                     for i in range(num_of_player):
@@ -376,7 +383,7 @@ def play ():
                          printm("Player " + str(i) + placeholder + "\n" + player_info_bid(players[i]), "i")
                          agent_input["players_public"].append(players[i].copy())
                          del agent_input["players_public"][i]["deck"]
-                    
+
                     printm("\n" + str(show_series(central_series, central_series_revealed_length)), "i")
                     agent_input["central_series_public"] = show_series(central_series, central_series_revealed_length)
                     printm("Starting Player: " + str(starting_player_index), "i")
@@ -385,7 +392,7 @@ def play ():
                     agent_input["current_highest_bid"] = current_highest_bid
 
                     skip = False
-                    
+
                     # forced to skip
                     if (current_player["token"] <= current_highest_bid - current_player["bid"]):
                          if (fleeing):
@@ -393,7 +400,7 @@ def play ():
                          printm("You are forced to skip since you don't have enough tokens to win the bid.", "o")
                          skip = True
 
-                    # not forced to skip  
+                    # not forced to skip
                     else:
                          if (fleeing):
                               printm("All other players fleed. Now you are the only bidder.", "o")
@@ -403,9 +410,12 @@ def play ():
                          else:
                               handler_manual(agent_input, agent_output)
                          bid_to_add = agent_output["bid_to_add"]
-                         
+
+                         # Record the bidding decision #
+                         game_recorder.decision_recorder(agent_input, agent_output)
+
                          skip = (bid_to_add == 0)
-                                             
+
                          if  (skip):
                               printm("You choose to skip.", "o")
                          else:
@@ -419,7 +429,7 @@ def play ():
                          current_player["skipped"] = True
                          current_player["token"] += current_player["bid"]
                          current_player["bid"] = 0
-                         
+
                          # receive the reward
                          reward = skip_rewards[reward_pointer]
                          current_player["token"] += reward
@@ -430,7 +440,7 @@ def play ():
                          printm("You receive a skip reward of " + str(reward) + placeholder, "o")
                          reward_pointer += 1
                          central_series_revealed_length += 1
-                         
+
                          if (fleeing): # fleeing + last player skip = blanking
                               blanking = True
                          elif (fleeing_detector): # detect fleeing
@@ -439,6 +449,7 @@ def play ():
                                    fleeing = True
                     else: # if a player does not skip , turn off the fleeing detector
                          fleeing_detector = 0
+
 
                     if (fleeing_loop_terminator):
                          break
@@ -485,6 +496,9 @@ def play ():
           game_result["winner"] = winner_index
           game_result["total_scores"] = total_scores
 
+          # Record the Result #
+          game_recorder.result_recorder(game_result)
+
           printm("\n--------------", "r")
           printm("Total Score", "r")
           printm("--------------", "r")
@@ -499,7 +513,7 @@ def play ():
           printm("\nThe winner is Player " + str(winner_index) + "!", "a")
 
           # Replay #
-          
+
           if (not AUTO_REPLAY):
                replay = input("\nNext game? (y/n) ")
                if (replay != "y"):
