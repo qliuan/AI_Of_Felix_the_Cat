@@ -2,11 +2,11 @@ import random
 import ast #ast.literal_eval
 
 DASHBOARD = {
-     "AGENT_MODE": 1,
+     "AGENT_MODE": 0,
      # 0: manual
      # 1: random_agent
 
-     "PRINT_MODE": "gr",
+     "PRINT_MODE": "r",
      # a: All / Always
      # g: Gameplay Title
      # t: Title
@@ -16,8 +16,7 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-
-     "NUM_OF_GAME_PLAY": 10,
+     "NUM_OF_GAME_PLAY": 200,
      "AUTO_REPLAY": True
      # 0: continue/stop playing at the end of the game
 }
@@ -47,7 +46,7 @@ def compute_series_score (series, deck_value):
                has_DOG = True
           elif (key == "dog"):
               has_dog = True
-          elif (key in deck_value.keys()):
+          if (key in deck_value.keys()):
                aux_list.append(deck_value[key])
 
      score = sum(aux_list)
@@ -169,7 +168,7 @@ def handler_random_agent (agent_input, agent_output):
                 current_player["token"], \
                 agent_input["rule_max_bid"]]
           )
-          if (max_bid_to_add == 0):
+          if (max_bid_to_add < 0):
                bid_to_add = 0
           else:
                bid_to_add = random.randrange(max_bid_to_add + 1)
