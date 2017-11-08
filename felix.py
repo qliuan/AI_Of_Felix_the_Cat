@@ -19,7 +19,7 @@ DASHBOARD = {
 
 
      "NUM_OF_GAME_PLAY": 10,
-     "AUTO_REPLAY": 0
+     "AUTO_REPLAY": True
      # 0: continue/stop playing at the end of the game
 }
 
@@ -254,14 +254,14 @@ def play ():
           "total_scores": []
      }
 
-     # Data Recorder Set-up #
-     game_recorder.set_recording()
-
      # Game Loop Start #
 
      for game_play in range(0, NUM_OF_GAME_PLAY):
 
           printm("\n###### GAME PLAY " + str(game_play) + " ######", "g")
+
+          # Data Recorder Set-up #
+          game_recorder.set_recording()
 
           # Game Initiation #
 
@@ -412,6 +412,9 @@ def play ():
                               handler_manual(agent_input, agent_output)
                          bid_to_add = agent_output["bid_to_add"]
 
+                         # Record the bidding decision #
+                         game_recorder.decision_recorder(agent_input, agent_output)
+
                          skip = (bid_to_add == 0)
 
                          if  (skip):
@@ -447,6 +450,7 @@ def play ():
                                    fleeing = True
                     else: # if a player does not skip , turn off the fleeing detector
                          fleeing_detector = 0
+
 
                     if (fleeing_loop_terminator):
                          break

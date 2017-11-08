@@ -29,11 +29,10 @@ def set_recording():
 
 	return
 
-def get_games_played(game_incre = True, sell_incre = False, bid_incre = False):
+def get_games_played(game_incre = True, sell_incre = 0, bid_incre = 0):
 	# Read the number of games played and update it
 	with open("raw_data/games_played.txt", 'r') as f:
 		count_list = f.read().split('\n')
-		print count_list
 		game = int(count_list[0])
 		sell = int(count_list[1])
 		bid  = int(count_list[2])
@@ -43,6 +42,25 @@ def get_games_played(game_incre = True, sell_incre = False, bid_incre = False):
 			file.write(str(game+1) + '\n')
 		else:
 			file.write(str(game) + '\n')
+
+		file.write(str(sell + sell_incre) + '\n')
+		file.write(str(bid  + bid_incre))
+
+	return game
+
+def decision_count(gamePath, player, sell_incre = False, bid_incre = False):
+	# Read the number of decisions and update it
+	filePath = gamePath + "/player" + str(player) + '/decision_counts.txt'
+	if not os.path.exists(filePath):
+		with open(filePath, 'w') as f:
+			f.write('0\n0')
+
+	with open(filePath, 'r') as f:
+		count_list = f.read().split('\n')
+		sell = int(count_list[0])
+		bid  = int(count_list[1])
+
+	with open(filePath, 'w') as file:
 		if (sell_incre):
 			file.write(str(sell+1) + '\n')
 		else:
@@ -52,7 +70,8 @@ def get_games_played(game_incre = True, sell_incre = False, bid_incre = False):
 		else:
 			file.write(str(bid))
 
-	return game
+	return sell,bid
+
 
 ## Recording a decision
 def decision_recorder(agent_input, agent_output):
@@ -61,7 +80,7 @@ def decision_recorder(agent_input, agent_output):
 	player = agent_input['my_index']
 	if(agent_input['stage'] == 1):
 		## Increment the counter
-		get_games_played(game_incre = False, sell_incre = True, bid_incre = False)
+		decision_count(gamePath, player, sell_incre = True, bid_incre = False)
 		## Selling stage
 		with open(gamePath + "/player" + str(player) + "/selling.txt", 'a') as sellFile:
 			sellFile.write(
@@ -105,7 +124,7 @@ def decision_recorder(agent_input, agent_output):
 
 	else:
 		## Increment the counter
-		get_games_played(game_incre = False, sell_incre = False, bid_incre = True)
+		decision_count(gamePath, player, sell_incre = False, bid_incre = True)
 		## Bidding stage
 		with open(gamePath + "/player" + str(player) + "/bidding.txt", 'a') as bidFile:
 			bidFile.write(
@@ -150,22 +169,26 @@ def decision_recorder(agent_input, agent_output):
 			bidFile.write(
 				"## Decision\n" +
 
-				str(DtoT[ agent_output['card_to_sell'] ]) +
+				str(agent_output['bid_to_add']) +
 
 				"\n\n" # One Epison ends
 			)
 
 	return
 
-# Record the result of the game
 # result = {'winner':1, 'total_scores':[30,40,64,120]}
 def result_recorder(result):
+	# Record the result of the game
 	num = get_games_played(game_incre = False)
 	gamePath = "raw_data/game" + str(num)
 	with open(gamePath + "/result.txt", 'w') as reFile:
 		reFile.write(str(result['winner']) + "\n")
 		reFile.write(str(result['total_scores'][0]) + " " + str(result['total_scores'][1]) + " " +
 					str(result['total_scores'][2]) + " " + str(result['total_scores'][3]))
+	# Count the winner to the games_played file
+	player = result['winner']
+	sell,bid = decision_count(gamePath,player,0,0)
+	get_games_played(game_incre = False, sell_incre = sell, bid_incre = bid)
 
 
 
@@ -192,7 +215,7 @@ def test():
 
 	outputDic = {'card_to_sell': 'DOG', 'bid_to_add': 2}
 
-	resultDic = {'winner': 2, 'score': [40,129,52,41]}
+	resultDic = {'winner': 0, 'total_scores': [40,129,52,41]}
 
 	# import ast
 	# dic = {"a":1, "b":2}
@@ -204,105 +227,19 @@ def test():
 	# print("Output:\n")
 	# print(outputDic)
 
-	decision_recorder(inputDic,outputDic)
-	inputDic['stage'] = 2
-	decision_recorder(inputDic,outputDic)
+	for i in range(10):
+		inputDic['stage'] = 1
+		decision_recorder(inputDic,outputDic)
+		inputDic['stage'] = 2
+		decision_recorder(inputDic,outputDic)
 
 	result_recorder(resultDic)
 
+	# import decision_printer
 	# decision_printer(inputDic,outputDic)
 	# inputDic['stage'] = 2
 	# decision_printer(inputDic,outputDic)
 
-def decision_printer(agent_input, agent_output):
-
-	if(agent_input['stage'] == 1):
-		## Selling stage
-		print(
-				"## Round information\n" +
-
-				str(agent_input['starting_player_index']) + " " +
-				str(agent_input['round']) + "\n" +
-
-				"## Player information\n" +
-
-				str(agent_input['my_index']) + "\n"
-			)
-
-		for i in range(4):
-			print(
-				str(agent_input['players_public'][i]['token']) + " " +
-				str(agent_input['players_public'][i]['score']) + " "
-			)
-
-			print(
-				str(BtoI[ str( '+3' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '+5' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '+8' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '+11' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '+15' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '0' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '-5' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '-8' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( 'dog' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( 'DOG' in agent_input['players_public'][i]['show_deck_public'] ) ]) + "\n"
-			)
-
-		print(
-			"## Decision\n" +
-
-			str(DtoT[ agent_output['card_to_sell'] ]) +
-
-			"\n\n" # One Epison ends
-		)
-	else:
-		print(
-			"## Bidding information\n" +
-
-			str(agent_input['starting_player_index']) + " " +
-			str(agent_input['round']) + " " +
-			str(agent_input['current_highest_bid']) + " " +
-			str(agent_input['reward_pointer']) + " " +
-			str(DtoT[ agent_input['central_series_public'][0] ]) + " " +
-			str(DtoT[ agent_input['central_series_public'][1] ]) + " " +
-			str(DtoT[ agent_input['central_series_public'][2] ]) + " " +
-			str(DtoT[ agent_input['central_series_public'][3] ]) + "\n" +
-
-			"## Player information\n" +
-
-			str(agent_input['my_index']) + "\n"
-		)
-
-		for i in range(4):
-			print(
-				str(agent_input['players_public'][i]['token']) + " " +
-				str(agent_input['players_public'][i]['score']) + " " +
-				str(BtoI[ str( agent_input['players_public'][i]['skipped'] ) ]) + " " +
-				str(agent_input['players_public'][i]['bid']) + " "
-			)
-
-			print(
-
-				str(BtoI[ str( '+3' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '+5' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '+8' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '+11' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '+15' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '0' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '-5' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( '-8' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( 'dog' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " " +
-				str(BtoI[ str( 'DOG' in agent_input['players_public'][i]['show_deck_public'] ) ]) + "\n"
-			)
-
-		print(
-			"## Decision\n" +
-
-			str(DtoT[ agent_output['card_to_sell'] ]) +
-
-			"\n\n" # One Epison ends
-		)
-
 if __name__ == '__main__':
-	set_recording()
+	test()
 	# get_games_played(True,True,True)
