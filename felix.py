@@ -164,15 +164,16 @@ def handler_random_agent (agent_input, agent_output):
           printm("RANDOM AGENT sells " + card_to_sell, "o")
           agent_output["card_to_sell"] = card_to_sell
      else:
-          max_bid_to_add = min(
-               [agent_input["current_highest_bid"] - current_player["bid"] + 1, \
-                current_player["token"], \
-                agent_input["rule_max_bid"]]
+          min_bid_to_add = agent_input["current_highest_bid"] - current_player["bid"] + 1
+          max_bid_to_add = max(
+               [
+                    agent_input["current_highest_bid"] - current_player["bid"] + agent_input["rule_max_bid"],
+                    current_player["token"]
+               ]
           )
-          if (max_bid_to_add < 0):
-               bid_to_add = 0
-          else:
-               bid_to_add = random.randrange(max_bid_to_add + 1)
+          choices = list(range(min_bid_to_add, max_bid_to_add + 1))
+          choices.append(0)
+          bid_to_add = random.choice(choices)
           printm("RANDOM AGENT adds " + str(bid_to_add), "o")
           agent_output["bid_to_add"]  = int(bid_to_add)
      #hold = input("Press any key to continue...")
