@@ -2,22 +2,14 @@ import random
 import ast #ast.literal_eval
 import game_recorder # recording decisions
 
-# TO-DOs
-# 2017-11-9 19:15 Aeolian ZHANG
-# 1. capitalize the name of global variables
-# 2. string formatting
-# 3. remove DASHBOARD
-# 4. if-else simplification
-# 5. set a flag for WIN_COUNTS
-
 DASHBOARD = {
-     "AGENT_MODE": 0,
+     "AGENT_MODE": 2,
      # 0: manual
      # 1: random_agent
 
-     "PRINT_MODE": "a",
+     "PRINT_MODE": "g",
      # a: All / Always
-     # g: Gameplay Title
+     # g: Gameplay Title and Winning Statistics
      # t: Title
      # i: Information
      # o: Agent Output
@@ -25,23 +17,23 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-     "NUM_OF_GAME_PLAY": 10,
-     "AUTO_REPLAY": True
-     # 0: continue/stop playing at the end of the game
+     "NUM_OF_GAME_PLAY": 100,
+     "AUTO_REPLAY": True,
+     "HOLD": False, # hold at the end of the agent function,
+     "WIN_RATE_COUNT": True
 }
 
 WIN_COUNTS = []
 
 # Console Display Set-up #
 
-fig_unrevealed = "*"
-fig_arrow = " <<<"
+FIG_UNREVEALED = "*"
+FIG_ARROW = " <<<"
 
 ### Functions ###
 
 # customized print
 def printm (text, text_type):
-     global DASHBOARD
      print_mode = DASHBOARD["PRINT_MODE"]
      if (text_type == "a") or ("a" in print_mode) or (text_type in print_mode):
           print(text)
@@ -50,8 +42,7 @@ def printm (text, text_type):
 def compute_series_score (series, deck_value):
      has_DOG = False
      has_dog = False
-     aux_list = [] # array of int, series without DOG and dog
-
+     aux_list = [] # array of int
      for key in series:
           if (key == "DOG"):
                has_DOG = True
@@ -59,7 +50,6 @@ def compute_series_score (series, deck_value):
               has_dog = True
           if (key in deck_value.keys()):
                aux_list.append(deck_value[key])
-
      score = sum(aux_list)
      if (has_DOG and has_dog):
           score = 0
@@ -67,7 +57,6 @@ def compute_series_score (series, deck_value):
           score = score - max(aux_list) # DOG eliminates max value
      elif (has_dog):
           score = score - min(aux_list) # dog eliminates min value
-
      return score
 
 # convert a dictionary <string, bool> to an array of string
@@ -85,58 +74,69 @@ def show_series (series, revealed_length):
      series_list = series[0: revealed_length]
      unrevealed_length = len(series) - revealed_length
      for _ in range(unrevealed_length):
-          series_list.append(fig_unrevealed)
+          series_list.append(FIG_UNREVEALED)
      return series_list
 
 # output a string containing the rewards information
 def  rewards_info (skip_rewards, reward_pointer):
-     reward = skip_rewards[reward_pointer]
-     output = "Skip Rewards: " + str(skip_rewards) + \
-              " Reward Pointer: " + str(reward_pointer) + \
-              " Current Reward: " + str(skip_rewards[reward_pointer])
+     output = "Skip Rewards: %s Reward Pointer: %d Current Reward: %d" % \
+              (str(skip_rewards), reward_pointer, skip_rewards[reward_pointer])
      return output
 
 # output a string containing the public information (excluding bid information) of a player
 def player_info (player):
-     output = "Score: " + str(player["score"]) + \
-              " Token: " + str(player["token"]) + \
-              " Deck: " + str(player["show_deck_public"])
+     output = "Score: %d Token: %d Deck: %s" % \
+              (player["score"], player["token"], str(player["show_deck_public"]))
      return output
 
 # output a string containing the public information (including bid information) of a player
 def player_info_bid (player):
-     output = "Score: " + str(player["score"]) + \
-              " Token: " + str(player["token"]) + \
-              " Bid: " + str(player["bid"]) + \
-              " Skipped: " + str(player["skipped"]) + \
-              " Deck: " + str(player["show_deck_public"])
+     output = "Score: %d Token: %d Bid: %d Skipped: %s Deck: %s" % \
+              (player["score"], player["token"], player["bid"], player["skipped"], str(player["show_deck_public"]))
      return output
 
 # output a string containing the information (excluding bid information) of a player when the game is over
 def player_info_game_over (player):
-     output = "Score: " + str(player["score"]) + \
-              " Token: " + str(player["token"]) + \
-              " Deck: " + str(show_deck(player["deck"]))
+     output = "Score: %d Token: %d Deck: %s" % \
+              (player["score"], player["token"], str(show_deck(player["deck"])))
      return output
 
 ### Agent Functions ###
 
+def handler (agent_input, agent_output):
+     AGENT_MODE = DASHBOARD["AGENT_MODE"]
+     HOLD = DASHBOARD["HOLD"]
+     if (AGENT_MODE == 0):
+          handler_manual (agent_input, agent_output)
+     else:
+          printm("INPUT DEBUG: ", "d")
+          printm(agent_input, "d")
+          if (AGENT_MODE == 1):
+               handler_random_agent (agent_input, agent_output)
+          else:
+               hold = input("ERROR unknown AGENT_MODE: %d." % AGENT_MODE)
+               exit()
+          if (HOLD):
+               hold = input("Press any key to continue...")
+          printm("OUTPUT DEBUG: ", "d")
+          printm(agent_output, "d")
+
 def handler_manual (agent_input, agent_output):
      current_player = agent_input["players_public"][agent_input["my_index"]]
      stage = agent_input["stage"]
-     if (stage == 1):
+     if (stage == 1): # in Selling Stage
           # possible conditions
           card_to_sell = input("Please choose a card to sell: ")
           invalid_card = (card_to_sell not in agent_input["my_deck"])
           played_card = (not invalid_card) and (agent_input["my_deck"][card_to_sell] == False)
           while (invalid_card or played_card):
-               print("You don't have " + card_to_sell)
+               print("You don't have %s" % card_to_sell)
                card_to_sell = input("Please choose a card to sell: ")
                # recompute possible conditions
                invalid_card = (card_to_sell not in agent_input["my_deck"])
                played_card = (not invalid_card) and (agent_input["my_deck"][card_to_sell] == False)
           agent_output["card_to_sell"] = card_to_sell
-     else:
+     else: # in Bidding Stage
           bid_to_add = input("Please decide the bid to add (input 0 to skip): ")
           # possible conditions
           numeric = bid_to_add.isnumeric()
@@ -150,11 +150,11 @@ def handler_manual (agent_input, agent_output):
                elif (negative_input):
                     bid_to_add = input("Please input a non-negative number:")
                elif (weak_bid):
-                    print("Your bid (" + str(current_player["bid"] + int(bid_to_add)) + \
-                          ") cannot beat the highest bid (" + str(agent_input["current_highest_bid"]) + ")")
+                    print("Your bid (%d) cannot beat the highest bid (%d)." % \
+                          (current_player["bid"] + int(bid_to_add), agent_input["current_highest_bid"]))
                     bid_to_add = input("Please decide the bid to add (input 0 to skip): ")
                else: # insufficient_token
-                    print("You don't have enough tokens (" + str(current_player["token"]) + ")!")
+                    print("You don't have enough tokens (%d)!" % current_player["token"])
                     bid_to_add = input("Please decide the bid to add (input 0 to skip): ")
                 # recompute possible conditions
                numeric = bid_to_add.isnumeric()
@@ -165,15 +165,13 @@ def handler_manual (agent_input, agent_output):
           agent_output["bid_to_add"]  = int(bid_to_add)
 
 def handler_random_agent (agent_input, agent_output):
-     printm("INPUT DEBUG: ", "d")
-     printm(agent_input, "d")
      current_player = agent_input["players_public"][agent_input["my_index"]]
      stage = agent_input["stage"]
-     if (stage == 1):
+     if (stage == 1): # in Selling Stage
           card_to_sell = random.choice(show_deck(agent_input["my_deck"]))
-          printm("RANDOM AGENT sells " + card_to_sell, "o")
+          printm("RANDOM AGENT sells %s" % card_to_sell, "o")
           agent_output["card_to_sell"] = card_to_sell
-     else:
+     else: # in Bidding Stage
           min_bid_to_add = agent_input["current_highest_bid"] - current_player["bid"] + 1
           max_bid_to_add = max(
                [
@@ -184,11 +182,10 @@ def handler_random_agent (agent_input, agent_output):
           choices = list(range(min_bid_to_add, max_bid_to_add + 1))
           choices.append(0)
           bid_to_add = random.choice(choices)
-          printm("RANDOM AGENT adds " + str(bid_to_add), "o")
+          placeholder = "s" if (bid_to_add > 1) else ""
+          printm("RANDOM AGENT adds %d token%s" % (bid_to_add, placeholder), "o")
           agent_output["bid_to_add"]  = int(bid_to_add)
-     #hold = input("Press any key to continue...")
-     printm("OUTPUT DEBUG: ", "d")
-     printm(agent_output, "d")
+          agent_output["bid_to_exceed"] = 0 if (bid_to_add == 0) else (current_player["bid"] + agent_output["bid_to_add"] - agent_input["current_highest_bid"])
 
 ### Game ###
 
@@ -198,6 +195,7 @@ def play ():
      PRINT_MODE = DASHBOARD["PRINT_MODE"]
      NUM_OF_GAME_PLAY = DASHBOARD["NUM_OF_GAME_PLAY"]
      AUTO_REPLAY = DASHBOARD["AUTO_REPLAY"]
+     WIN_RATE_COUNT = DASHBOARD["WIN_RATE_COUNT"]
 
      # Game Rules Set-up #
 
@@ -256,7 +254,8 @@ def play ():
 
      agent_output_template = {
           "card_to_sell": "INITIAL",
-          "bid_to_add": -1
+          "bid_to_add": -1,
+          "bid_to_exceed": -1
      }
 
      game_result = {
@@ -264,14 +263,15 @@ def play ():
           "total_scores": []
      }
 
-     # Game Loop Start #
-
-     for _ in range(num_of_player):
-          WIN_COUNTS.append(0)
+     # Game Loop #
+     
+     if (WIN_RATE_COUNT):
+          for _ in range(num_of_player):
+               WIN_COUNTS.append(0)
 
      for game_play in range(0, NUM_OF_GAME_PLAY):
 
-          printm("\n###### GAME PLAY " + str(game_play) + " ######", "g")
+          printm("\n###### GAME PLAY %d ######" % game_play, "g")
 
           # Data Recorder Set-up #
           game_recorder.set_recording()
@@ -298,7 +298,7 @@ def play ():
                agent_output = agent_output_template.copy()
 
                printm("\n========", "t")
-               printm(" Round " + str(current_round), "t")
+               printm(" Round %d" % current_round, "t")
                printm("========", "t")
                agent_input["round"] = current_round
                agent_input["starting_player_index"] = starting_player_index
@@ -334,27 +334,21 @@ def play ():
                     current_player = players[current_player_index]
                     current_deck = current_player["deck"]
 
-                    printm("\n<Player " + str(current_player_index) + "'s Turn>\n", "t")
+                    printm("\n<Player %d's Turn>\n" % current_player_index, "t")
                     agent_input["my_index"] = current_player_index
 
                     # information (excluding bid) of all players
                     agent_input["players_public"] = []
                     for i in range(num_of_player):
-                         if (i == current_player_index):
-                              placeholder = fig_arrow
-                         else:
-                              placeholder = ""
-                         printm("Player " + str(i) + placeholder + "\n" + player_info(players[i]), "i")
+                         placeholder = FIG_ARROW if (i == current_player_index) else ""
+                         printm("Player %d%s\n%s" % (i, placeholder, player_info(players[i])), "i")
                          agent_input["players_public"].append(players[i].copy())
                          del agent_input["players_public"][i]["deck"]
 
                     printm("\n" + str(show_deck(current_deck)), "i")
                     agent_input["my_deck"] = current_deck
 
-                    if (AGENT_MODE) == 1:
-                         handler_random_agent(agent_input, agent_output)
-                    else:
-                         handler_manual(agent_input, agent_output)
+                    handler(agent_input, agent_output)
                     card_to_sell = agent_output["card_to_sell"]
 
                     # Record the selling decision #
@@ -390,11 +384,8 @@ def play ():
                     # information (including bid) of all players
                     agent_input["players_public"] = []
                     for i in range(num_of_player):
-                         if (i == current_player_index):
-                              placeholder = fig_arrow
-                         else:
-                              placeholder = ""
-                         printm("Player " + str(i) + placeholder + "\n" + player_info_bid(players[i]), "i")
+                         placeholder = FIG_ARROW if (i == current_player_index) else ""
+                         printm("Player %d%s\n%s" % (i, placeholder, player_info_bid(players[i])), "i")
                          agent_input["players_public"].append(players[i].copy())
                          del agent_input["players_public"][i]["deck"]
 
@@ -419,10 +410,7 @@ def play ():
                          if (fleeing):
                               printm("All other players fleed. Now you are the only bidder.", "o")
 
-                         if (AGENT_MODE == 1):
-                              handler_random_agent(agent_input, agent_output)
-                         else:
-                              handler_manual(agent_input, agent_output)
+                         handler(agent_input, agent_output)
                          bid_to_add = agent_output["bid_to_add"]
 
                          # Record the bidding decision #
@@ -514,12 +502,13 @@ def play ():
           printm("--------------", "r")
 
           for i in range(num_of_player):
-               placeholder = fig_arrow if (i == winner_index) else ""
+               placeholder = FIG_ARROW if (i == winner_index) else ""
                printm("Player %d %d%s" % (i, total_scores[i], placeholder), "r")
 
-          printm("\nThe winner is Player %d !" % winner_index, "a")
+          printm("\nThe winner is Player %d !" % winner_index, "r")
 
-          WIN_COUNTS[winner_index] += 1
+          if (WIN_RATE_COUNT):
+               WIN_COUNTS[winner_index] += 1
 
           # Replay #
 
@@ -527,10 +516,13 @@ def play ():
                replay = input("\nNext game? (y/n) ")
                if (replay != "y"):
                     break
-               
-     printm("\n###### WIN RATE ######", "g")              
-     for i in range(num_of_player):
-          printm("Player %d %.2f" % (i, WIN_COUNTS[i] / (game_play + 1)), "g")
+
+     if (WIN_RATE_COUNT):     
+          printm("\n###### WINNING STATISTICS ######", "g")
+          total_game_play = game_play + 1
+          printm("Total game play: %d" % total_game_play, "g")
+          for i in range(num_of_player):
+               printm("Player %d Winning: %d Winning Rate: %.2f" % (i, WIN_COUNTS[i], WIN_COUNTS[i] / total_game_play), "g")
 
 # Main #
 
