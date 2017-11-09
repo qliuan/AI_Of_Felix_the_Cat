@@ -3,7 +3,7 @@ import ast #ast.literal_eval
 import game_recorder # recording decisions
 
 DASHBOARD = {
-     "AGENT_MODE": 2,
+     "AGENT_MODE": 1,
      # 0: manual
      # 1: random_agent
 
