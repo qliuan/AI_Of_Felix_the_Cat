@@ -2,12 +2,20 @@ import random
 import ast #ast.literal_eval
 import game_recorder # recording decisions
 
+# TO-DOs
+# 2017-11-9 19:15 Aeolian ZHANG
+# 1. capitalize the name of global variables
+# 2. string formatting
+# 3. remove DASHBOARD
+# 4. if-else simplification
+# 5. set a flag for WIN_COUNTS
+
 DASHBOARD = {
      "AGENT_MODE": 0,
      # 0: manual
      # 1: random_agent
 
-     "PRINT_MODE": "r",
+     "PRINT_MODE": "a",
      # a: All / Always
      # g: Gameplay Title
      # t: Title
@@ -17,10 +25,12 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-     "NUM_OF_GAME_PLAY": 200,
+     "NUM_OF_GAME_PLAY": 10,
      "AUTO_REPLAY": True
      # 0: continue/stop playing at the end of the game
 }
+
+WIN_COUNTS = []
 
 # Console Display Set-up #
 
@@ -136,7 +146,7 @@ def handler_manual (agent_input, agent_output):
           insufficient_token = numeric and (int(bid_to_add) > current_player["token"])
           while ((not numeric) or negative_input or weak_bid or insufficient_token):
                if (not numeric):
-                    bid_to_add = input("Please input a number:")
+                    bid_to_add = input("Please input a number :")
                elif (negative_input):
                     bid_to_add = input("Please input a non-negative number:")
                elif (weak_bid):
@@ -183,7 +193,7 @@ def handler_random_agent (agent_input, agent_output):
 ### Game ###
 
 def play ():
-     global DASHBOARD
+     
      AGENT_MODE = DASHBOARD["AGENT_MODE"]
      PRINT_MODE = DASHBOARD["PRINT_MODE"]
      NUM_OF_GAME_PLAY = DASHBOARD["NUM_OF_GAME_PLAY"]
@@ -255,6 +265,9 @@ def play ():
      }
 
      # Game Loop Start #
+
+     for _ in range(num_of_player):
+          WIN_COUNTS.append(0)
 
      for game_play in range(0, NUM_OF_GAME_PLAY):
 
@@ -370,7 +383,7 @@ def play ():
                     if (current_player["skipped"]):
                          continue
 
-                    printm("\n<Player " + str(current_player_index) + "'s Turn>\n", "t")
+                    printm("\n<Player %d's Turn>\n" % current_player_index, "t")
                     agent_input["my_index"] = current_player_index
                     agent_input["my_deck"] = current_deck
 
@@ -387,7 +400,7 @@ def play ():
 
                     printm("\n" + str(show_series(central_series, central_series_revealed_length)), "i")
                     agent_input["central_series_public"] = show_series(central_series, central_series_revealed_length)
-                    printm("Starting Player: " + str(starting_player_index), "i")
+                    printm("Starting Player: %d" % starting_player_index, "i")
                     printm(rewards_info(skip_rewards, reward_pointer), "i")
                     agent_input["reward_pointer"] = reward_pointer
                     agent_input["current_highest_bid"] = current_highest_bid
@@ -424,7 +437,7 @@ def play ():
                               current_player["bid"] += bid_to_add
                               current_highest_bid = current_player["bid"]
                               current_highest_bidder_index = current_player_index
-                              printm("You add your bid to " + str(current_player["bid"]), "o")
+                              printm("You add your bid to %d." % current_player["bid"], "o")
 
                     if (skip):
                          current_player["skipped"] = True
@@ -434,11 +447,10 @@ def play ():
                          # receive the reward
                          reward = skip_rewards[reward_pointer]
                          current_player["token"] += reward
-                         if (reward > 1):
-                              placeholder = " tokens."
-                         else:
-                              placeholder = " token."
-                         printm("You receive a skip reward of " + str(reward) + placeholder, "o")
+                         
+                         placeholder = "s" if (reward > 1) else ""
+                         
+                         printm("You receive a skip reward of %d token%s." % (reward, placeholder), "o")
                          reward_pointer += 1
                          central_series_revealed_length += 1
 
@@ -471,13 +483,10 @@ def play ():
                     bid_winner["bid"] = 0
                     bid_winner["score"] += score
 
-                    if (reward > 1):
-                         placeholder = " tokens."
-                    else:
-                         placeholder = " token."
+                    placeholder = "s" if (reward > 1) else ""
 
-                    printm("Player " + str(bid_winner_index) + " win the bid of score " +\
-                          str(score) + " at the cost of " + str(cost) + placeholder, "b")
+                    printm("Player %d win the bid of score %d at the cost of %d token%s." % \
+                           (bid_winner_index, score, cost, placeholder), "b")
 
                     starting_player_index = bid_winner_index
 
@@ -489,7 +498,7 @@ def play ():
 
           for i in range(num_of_player):
                total_scores.append(players[i]["score"] + players[i]["token"])
-               printm("Player " + str(i) + "\n" + player_info_game_over(players[i]), "i")
+               printm("Player %d\n%s" % (i, player_info_game_over(players[i])), "i")
 
           winner_index = total_scores.index(max(total_scores))
 
@@ -505,13 +514,12 @@ def play ():
           printm("--------------", "r")
 
           for i in range(num_of_player):
-               if (i == winner_index):
-                    placeholder = fig_arrow
-               else:
-                    placeholder = ""
-               printm("Player " + str(i) + " " + str(total_scores[i]) + placeholder, "r")
+               placeholder = fig_arrow if (i == winner_index) else ""
+               printm("Player %d %d%s" % (i, total_scores[i], placeholder), "r")
 
-          printm("\nThe winner is Player " + str(winner_index) + "!", "a")
+          printm("\nThe winner is Player %d !" % winner_index, "a")
+
+          WIN_COUNTS[winner_index] += 1
 
           # Replay #
 
@@ -519,9 +527,13 @@ def play ():
                replay = input("\nNext game? (y/n) ")
                if (replay != "y"):
                     break
-
+               
+     printm("\n###### WIN RATE ######", "g")              
+     for i in range(num_of_player):
+          printm("Player %d %.2f" % (i, WIN_COUNTS[i] / (game_play + 1)), "g")
 
 # Main #
 
 if __name__=="__main__":
      play()
+
