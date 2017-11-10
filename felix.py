@@ -130,7 +130,7 @@ def handler_manual (agent_input, agent_output):
           invalid_card = (card_to_sell not in agent_input["my_deck"])
           played_card = (not invalid_card) and (agent_input["my_deck"][card_to_sell] == False)
           while (invalid_card or played_card):
-               print("You don't have %s" % card_to_sell)
+               print("You don't have %s." % card_to_sell)
                card_to_sell = input("Please choose a card to sell: ")
                # recompute possible conditions
                invalid_card = (card_to_sell not in agent_input["my_deck"])
@@ -146,9 +146,9 @@ def handler_manual (agent_input, agent_output):
           insufficient_token = numeric and (int(bid_to_add) > current_player["token"])
           while ((not numeric) or negative_input or weak_bid or insufficient_token):
                if (not numeric):
-                    bid_to_add = input("Please input a number :")
+                    bid_to_add = input("Please input a number: ")
                elif (negative_input):
-                    bid_to_add = input("Please input a non-negative number:")
+                    bid_to_add = input("Please input a non-negative number: ")
                elif (weak_bid):
                     print("Your bid (%d) cannot beat the highest bid (%d)." % \
                           (current_player["bid"] + int(bid_to_add), agent_input["current_highest_bid"]))
