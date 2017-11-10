@@ -17,10 +17,11 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-     "NUM_OF_GAME_PLAY": 100,
+     "NUM_OF_GAME_PLAY": 10,
      "AUTO_REPLAY": True,
      "HOLD": False, # hold at the end of the agent function,
-     "WIN_RATE_COUNT": True
+     "WIN_RATE_COUNT": True,
+     "GAME_RECORD": True
 }
 
 WIN_COUNTS = []
@@ -196,6 +197,7 @@ def play ():
      NUM_OF_GAME_PLAY = DASHBOARD["NUM_OF_GAME_PLAY"]
      AUTO_REPLAY = DASHBOARD["AUTO_REPLAY"]
      WIN_RATE_COUNT = DASHBOARD["WIN_RATE_COUNT"]
+     GAME_RECORD= DASHBOARD["GAME_RECORD"]
 
      # Game Rules Set-up #
 
@@ -274,7 +276,8 @@ def play ():
           printm("\n###### GAME PLAY %d ######" % game_play, "g")
 
           # Data Recorder Set-up #
-          game_recorder.set_recording()
+          if (GAME_RECORD):
+               game_recorder.set_recording()
 
           # Game Initiation #
 
@@ -352,7 +355,8 @@ def play ():
                     card_to_sell = agent_output["card_to_sell"]
 
                     # Record the selling decision #
-                    game_recorder.decision_recorder(agent_input, agent_output)
+                    if (GAME_RECORD):
+                         game_recorder.decision_recorder(agent_input, agent_output)
 
                     current_deck[card_to_sell] = False
                     central_series.append(card_to_sell)
@@ -414,7 +418,8 @@ def play ():
                          bid_to_add = agent_output["bid_to_add"]
 
                          # Record the bidding decision #
-                         game_recorder.decision_recorder(agent_input, agent_output)
+                         if (GAME_RECORD):
+                              game_recorder.decision_recorder(agent_input, agent_output)
 
                          skip = (bid_to_add == 0)
 
@@ -495,7 +500,8 @@ def play ():
           game_result["total_scores"] = total_scores
 
           # Record the Result #
-          game_recorder.result_recorder(game_result)
+          if (GAME_RECORD):
+               game_recorder.result_recorder(game_result)
 
           printm("\n--------------", "r")
           printm("Total Score", "r")
@@ -522,7 +528,8 @@ def play ():
           total_game_play = game_play + 1
           printm("Total game play: %d" % total_game_play, "g")
           for i in range(num_of_player):
-               printm("Player %d Winning: %d Winning Rate: %.2f" % (i, WIN_COUNTS[i], WIN_COUNTS[i] / total_game_play), "g")
+               printm("Player %d Winning: %d Winning Rate: %.2f" % \
+                      (i, WIN_COUNTS[i], float(WIN_COUNTS[i]) / float(total_game_play)), "g")
 
 # Main #
 
