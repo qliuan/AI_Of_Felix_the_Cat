@@ -66,6 +66,7 @@ def parse_input(agent_input):
 	featureStr = ""
 	if(agent_input['stage'] == 1):
 		## Selling stage
+		targetType = 'sell'
 		featureStr += 	str(agent_input['starting_player_index']) + " " + str(agent_input['round']) + " " + str(agent_input['my_index']) + " "
 
 		for i in range(4):
@@ -83,6 +84,7 @@ def parse_input(agent_input):
 			featureStr +=	str(BtoI[ str( 'DOG' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " "
 
 	else:
+		targetType = 'bid'
 		featureStr += str(agent_input['starting_player_index']) + " " + str(agent_input['round']) + " " + str(agent_input['current_highest_bid']) + " " + str(agent_input['reward_pointer']) + " " + str(DtoT[ agent_input['central_series_public'][0] ]) + " " + str(DtoT[ agent_input['central_series_public'][1] ]) + " " + str(DtoT[ agent_input['central_series_public'][2] ]) + " " + str(DtoT[ agent_input['central_series_public'][3] ]) + " " + str(agent_input['my_index']) + " "
 
 		for i in range(4):
@@ -101,11 +103,20 @@ def parse_input(agent_input):
 
 	# print "Feature String:\n" + featureStr.rstrip()
 
-	feature = np.fromstring(featureStr.rstrip(), dtype=int, sep=' ')
-	# print "Feature: " + str(feature.shape) + '\n'
-	# print feature
-	# print "\n"
-	return feature
+	with open("feature.txt", 'w') as file:
+		file.write(featureStr.rstrip())
+
+	feature = np.loadtxt("feature.txt", delimiter=" ")
+	num = featureNum[targetType]
+	print "feature: "
+	print feature.shape
+
+	X = feature.reshape(1,num) # Features
+
+	print "X: "
+	print X.shape
+
+	return X
 
 
 

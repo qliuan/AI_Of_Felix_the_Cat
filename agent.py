@@ -3,71 +3,75 @@ import numpy as np
 from sklearn.externals import joblib
 from sklearn.preprocessing import StandardScaler
 import data_parser
+from sklearn import svm
 
 featureNum = {"sell" : 51, "bid" : 65}
 modelTypes = {	"svm": "Support Vector Machine",
 				"nn" : "Neural Networ",
 				"lr" : "Linear Regression" }
 
-class Agent:
-	def __init__(self, targetType = "sell", modelType = "svm"):
-		print "\nInit the agent\n"
+def set_up_agents(model = "svm"):
+	sellAgent = SVMAgent("sell")
+	bidAgent = SVMsAgent("bid")
+	return sellAgent, bidAgent
+
+def preprocess_feature(X):
+	# Preprocess the Features
+	scaler = StandardScaler().fit(X)
+	X = scaler.transform(X)	# Rescale the data
+	return X
+
+class SVMAgent:
+	def __init__(self, targetType = "sell"):
 
 		self.targetType = targetType
-		self.modelType = modelType
 		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
-		self.modelPath = "selling_model/"+modelType+".pkl" if targetType=='sell' else "bidding_model/"+modelType+".pkl"
-
-		print "\nInit the agent DONE\n"
+		self.modelPath = "selling_model/svm.pkl" if targetType=='sell' else "bidding_model/svm.pkl"
 
 	def train(self):
-		print "\nTrain the agent\n"
 		# Parse the raw data to get the updated data
 		data_parser.parse_raw_data()
 		# Load data from the txt file
 		with open(self.dataPath, 'r') as file:
 			dataset = np.loadtxt(file, delimiter=" ")
+
 		num = featureNum[self.targetType]
-		X = dataset[:,0:num-1]	# Features
+		X = dataset[:,0:num]	# Features
 		y = dataset[:,num]		# Target
 
-		# Preprocess the Features
-		scaler = StandardScaler().fit(X)
-		X = scaler.transform(X)	# Rescale the data
+		# print "dataset: "
+		# print dataset.shape
+		# print "X: "
+		# print X.shape
+		# print type(X)
+		# print "y:"
+		# print y.shape
 
-
-		if self.modelType == "svm" :
-			# Train the Support Vector Machine model
-			model = svm_fit(X,y)
+		X = preprocess_feature(X)
+		# Train the Support Vector Machine model
+		model = svm.SVC()
+		model.fit(X,y)
 
 		# Store the model
 		joblib.dump(model, self.modelPath)
 
-		print "\nTrain the agent DONE\n"
-
 	def predict(self,agent_input):
 		feature = data_parser.parse_input(agent_input)
+		# print "Feature for prediction:\n"
+		# print feature
 		model = joblib.load(self.modelPath)
+		feature = preprocess_feature(feature)
+		predict = model.predict(feature)
 
-		return int(model.predict(feature))
+		return int(predict[0]) # return the decision
 
-def svm_fit(X,y):
-	from sklearn import svm
-	model = svm.SVC()
-	model.fit(X,y)
-
-
-def set_up_agents(model = "svm"):
-	sellAgent = Agent("sell", model)
-	bidAgent = Agent("bid", model)
-	return sellAgent, bidAgent
 
 if __name__ == "__main__":
-	sellAgent = Agent(targetType = "sell", modelType = "svm")
+	sellAgent = SVMAgent(targetType = "sell")
 	sellAgent.train()
 	print "Selling Agent trainning done\n"
 
-	bidAgent = Agent(targetType = "bid", modelType = "svm")
+	bidAgent = SVMAgent(targetType = "bid")
 	bidAgent.train()
 	print "Bidding Agent trainning done\n"
 
@@ -87,10 +91,12 @@ if __name__ == "__main__":
 		]
 	}
 
+	outputDic = {'card_to_sell': 'DOG', 'bid_to_add': 2}
+
 	sell = sellAgent.predict(inputDic)
 	inputDic["stage"] = 2
 	bid = bidAgent.predict(inputDic)
 
-	print "Sell: " + str(sell) + " Bid: " + str(bid)
+	print "Sell: " + str(sell) + "\nBid: " + str(bid) + "\n"
 
 
