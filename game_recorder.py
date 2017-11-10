@@ -169,7 +169,7 @@ def decision_recorder(agent_input, agent_output):
 			bidFile.write(
 				"## Decision\n" +
 
-				str(agent_output['bid_to_add']) +
+				str(agent_output['bid_to_exceed']) +
 
 				"\n\n" # One Epison ends
 			)
@@ -242,4 +242,3 @@ def test():
 
 if __name__ == '__main__':
 	test()
-	# get_games_played(True,True,True)
