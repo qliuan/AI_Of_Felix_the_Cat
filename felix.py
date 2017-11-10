@@ -169,7 +169,7 @@ def handler_random_agent (agent_input, agent_output):
      stage = agent_input["stage"]
      if (stage == 1): # in Selling Stage
           card_to_sell = random.choice(show_deck(agent_input["my_deck"]))
-          printm("RANDOM AGENT sells %s" % card_to_sell, "o")
+          printm("RANDOM AGENT sells %s." % card_to_sell, "o")
           agent_output["card_to_sell"] = card_to_sell
      else: # in Bidding Stage
           min_bid_to_add = agent_input["current_highest_bid"] - current_player["bid"] + 1
@@ -183,7 +183,7 @@ def handler_random_agent (agent_input, agent_output):
           choices.append(0)
           bid_to_add = random.choice(choices)
           placeholder = "s" if (bid_to_add > 1) else ""
-          printm("RANDOM AGENT adds %d token%s" % (bid_to_add, placeholder), "o")
+          printm("RANDOM AGENT adds %d token%s." % (bid_to_add, placeholder), "o")
           agent_output["bid_to_add"]  = int(bid_to_add)
           agent_output["bid_to_exceed"] = 0 if (bid_to_add == 0) else (current_player["bid"] + agent_output["bid_to_add"] - agent_input["current_highest_bid"])
 
@@ -505,7 +505,7 @@ def play ():
                placeholder = FIG_ARROW if (i == winner_index) else ""
                printm("Player %d %d%s" % (i, total_scores[i], placeholder), "r")
 
-          printm("\nThe winner is Player %d !" % winner_index, "r")
+          printm("\nThe winner is Player %d!" % winner_index, "r")
 
           if (WIN_RATE_COUNT):
                WIN_COUNTS[winner_index] += 1
