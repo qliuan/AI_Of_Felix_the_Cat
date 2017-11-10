@@ -9,6 +9,11 @@ DtoT = {'+3': 0, '+5': 1, '+8': 2, '+11': 3, '+15': 4, '0': 5, '-5': 6, '-8': 7,
 
 def parse_raw_data():
 	rawDataPath = "raw_data"
+	sellingDataPath = "sellingData.txt"
+	biddingDataPath = "biddingData.txt"
+	empty_data(biddingDataPath)
+	empty_data(sellingDataPath)
+
 	for folder in os.listdir(rawDataPath):
 		if '.' in folder: # Skip "result.txt" and files starting with "."
 			continue
@@ -24,13 +29,9 @@ def parse_raw_data():
 		# print "BiddingPath: " + biddingPath
 
 		# Handling the parsing of selling data
-		sellingDataPath = "sellingData.txt"
-		empty_data(sellingDataPath)
 		parse_file(sellingPath, sellingDataPath)
 
 		# Handling the parsing of selling data
-		biddingDataPath = "biddingData.txt"
-		empty_data(biddingDataPath)
 		parse_file(biddingPath, biddingDataPath)
 
 
@@ -54,7 +55,7 @@ def parse_file(rawDataFile, dataFile):
 		episode += raw.readline().rstrip() + "\n"
 		raw.readline() # "\n"
 
-		print "Episode Done:\n" + episode
+		# print "Episode Done:\n" + episode
 		# raw_input('Enter your input:')
 		data.write(episode)
 
@@ -98,12 +99,12 @@ def parse_input(agent_input):
 			featureStr += str(BtoI[ str( 'dog' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " "
 			featureStr += str(BtoI[ str( 'DOG' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " "
 
-	print "Feature String:\n" + featureStr.rstrip()
+	# print "Feature String:\n" + featureStr.rstrip()
 
 	feature = np.fromstring(featureStr.rstrip(), dtype=int, sep=' ')
-	print "Feature: " + str(feature.shape) + '\n'
-	print feature
-	print "\n"
+	# print "Feature: " + str(feature.shape) + '\n'
+	# print feature
+	# print "\n"
 	return feature
 
 

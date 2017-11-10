@@ -242,4 +242,3 @@ def test():
 
 if __name__ == '__main__':
 	test()
-	# get_games_played(True,True,True)

@@ -190,7 +190,7 @@ def handler_random_agent (agent_input, agent_output):
 ### Game ###
 
 def play ():
-     
+
      AGENT_MODE = DASHBOARD["AGENT_MODE"]
      PRINT_MODE = DASHBOARD["PRINT_MODE"]
      NUM_OF_GAME_PLAY = DASHBOARD["NUM_OF_GAME_PLAY"]
@@ -264,7 +264,7 @@ def play ():
      }
 
      # Game Loop #
-     
+
      if (WIN_RATE_COUNT):
           for _ in range(num_of_player):
                WIN_COUNTS.append(0)
@@ -435,9 +435,9 @@ def play ():
                          # receive the reward
                          reward = skip_rewards[reward_pointer]
                          current_player["token"] += reward
-                         
+
                          placeholder = "s" if (reward > 1) else ""
-                         
+
                          printm("You receive a skip reward of %d token%s." % (reward, placeholder), "o")
                          reward_pointer += 1
                          central_series_revealed_length += 1
@@ -517,12 +517,12 @@ def play ():
                if (replay != "y"):
                     break
 
-     if (WIN_RATE_COUNT):     
+     if (WIN_RATE_COUNT):
           printm("\n###### WINNING STATISTICS ######", "g")
           total_game_play = game_play + 1
           printm("Total game play: %d" % total_game_play, "g")
           for i in range(num_of_player):
-               printm("Player %d Winning: %d Winning Rate: %.2f" % (i, WIN_COUNTS[i], WIN_COUNTS[i] / total_game_play), "g")
+               printm("Player %d Winning: %d Winning Rate: %.2f" % (i, WIN_COUNTS[i], float(WIN_COUNTS[i]) /total_game_play), "g")
 
 # Main #
 
