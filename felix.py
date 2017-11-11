@@ -3,11 +3,20 @@ import ast #ast.literal_eval
 import game_recorder # recording decisions
 import agent
 
+# TO-DOs
+# 1. distinguished agents for players
+# 2. design naive agent
+
 DASHBOARD = {
      "AGENT_MODE": 3,
      # 0: manual
      # 1: random_agent
-     # 3: svm_agent
+     # 2: naive_agent
+     # 3: gen1_agent (svm_agent / nn_agent / nb_agent / dt_agent / lr_agent)
+
+     "AGENT_NAME": "svm",
+     # when AGENT_MODE == 3
+     # svm, nn, nb, dt, lr
 
      "PRINT_MODE": "a",
      # a: All / Always
@@ -108,6 +117,7 @@ def player_info_game_over (player):
 
 def handler (agent_input, agent_output):
      AGENT_MODE = DASHBOARD["AGENT_MODE"]
+     AGENT_NAME = DASHBOARD["AGENT_NAME"]
      HOLD = DASHBOARD["HOLD"]
      if (AGENT_MODE == 0):
           handler_manual (agent_input, agent_output)
@@ -116,8 +126,10 @@ def handler (agent_input, agent_output):
           printm(agent_input, "d")
           if (AGENT_MODE == 1):
                handler_random_agent (agent_input, agent_output)
+          elif (AGENT_MODE == 2):
+               handler_naive_agent (agent_input, agent_output)
           elif (AGENT_MODE == 3):
-               handler_svm_agent (agent_input, agent_output)
+               handler_gen1_agent (agent_input, agent_output, AGENT_NAME)
           else:
                hold = input("ERROR unknown AGENT_MODE: %d." % AGENT_MODE)
                exit()
@@ -174,7 +186,7 @@ def handler_random_agent (agent_input, agent_output):
      stage = agent_input["stage"]
      if (stage == 1): # in Selling Stage
           card_to_sell = random.choice(show_deck(agent_input["my_deck"]))
-          printm("RANDOM AGENT sells %s." % card_to_sell, "o")
+          printm("RANDOM AGENT sells %s." % card_to_sell, "o") 
           agent_output["card_to_sell"] = card_to_sell
      else: # in Bidding Stage
           min_bid_to_add = agent_input["current_highest_bid"] - current_player["bid"] + 1
@@ -189,18 +201,52 @@ def handler_random_agent (agent_input, agent_output):
           bid_to_add = random.choice(choices)
           placeholder = "s" if (bid_to_add > 1) else ""
           printm("RANDOM AGENT adds %d token%s." % (bid_to_add, placeholder), "o")
-          agent_output["bid_to_add"]  = int(bid_to_add)
-          agent_output["bid_to_exceed"] = 0 if (bid_to_add == 0) else (current_player["bid"] + agent_output["bid_to_add"] - agent_input["current_highest_bid"])
+          bid_to_exceed = 0 if (bid_to_add == 0) else (bid_to_add + current_player["bid"] - agent_input["current_highest_bid"])
+          agent_output["bid_to_add"]  = bid_to_add
+          agent_output["bid_to_exceed"] =  bid_to_exceed
 
-def handler_svm_agent (agent_input, agent_output):
+# NOT FINISHED!
+def handler_naive_agent (agent_input, agent_output):
+     current_player = agent_input["players_public"][agent_input["my_index"]]
      stage = agent_input["stage"]
      if (stage == 1): # in Selling Stage
-          num = agent.predict(agent_input)
-          print(num)
-          hold = input("HOLD")
+          pass
      else: # in Bidding Stage
           pass
-          
+
+def handler_gen1_agent (agent_input, agent_output, agent_name):
+     current_player = agent_input["players_public"][agent_input["my_index"]]
+     stage = agent_input["stage"]
+     if (agent_name == "svm"):
+          sell_agent = SVMAgent(targetType = "sell")
+          bid_agent = SVMAgent(targetType = "bid")
+     elif (agent_name == "nn"):
+          sell_agent = NNAgent(targetType = "sell")
+          bid_agent = NNAgent(targetType = "bid")
+     elif (agent_name == "nb"):
+          sell_agent = NBAgent(targetType = "sell")
+          bid_agent = NBAgent(targetType = "bid")
+     elif (agent_name == "dt"):
+          sell_agent = DTAgent(targetType = "sell")
+          bid_agent = DTAgent(targetType = "bid")
+     elif (agent_name == "lr"):
+          sell_agent = LRAgent(targetType = "sell")
+          bid_agent = LRAgent(targetType = "bid")
+     else:
+          hold = input("ERROR unknown AGENT_NAME: %s." % agent_name)
+          exit()
+     if (stage == 1): # in Selling Stage
+          card_to_sell = sell_agent.predict(agent_input)
+          printm("%s AGENT sells %s." % (agent_name, card_to_sell), "o")
+          agent_output["card_to_sell"] = card_to_sell
+     else: # in Bidding Stage
+          bid_to_exceed = bid_agent_predict(agent_input)
+          bid_to_add = 0 if (bid_to_exceed == 0) else (bid_to_exceed + agent_input["current_highest_bid"] - current_player["bid"])
+          placeholder = "s" if (bid_to_add > 1) else ""
+          printm("%s AGENT adds %d token%s." % (agent_name, bid_to_add, placeholder), "o")
+          agent_output["bid_to_exceed"] = bid_to_exceed
+          agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else ()
+
 ### Game ###
 
 def play ():
