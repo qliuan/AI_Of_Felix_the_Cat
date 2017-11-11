@@ -1,13 +1,15 @@
 import random
 import ast #ast.literal_eval
 import game_recorder # recording decisions
+import agent
 
 DASHBOARD = {
-     "AGENT_MODE": 1,
+     "AGENT_MODE": 3,
      # 0: manual
      # 1: random_agent
+     # 3: svm_agent
 
-     "PRINT_MODE": "g",
+     "PRINT_MODE": "a",
      # a: All / Always
      # g: Gameplay Title and Winning Statistics
      # t: Title
@@ -18,7 +20,7 @@ DASHBOARD = {
      # d: Debug
 
      "NUM_OF_GAME_PLAY": 10,
-     "AUTO_REPLAY": True,
+     "AUTO_REPLAY": False,
      "HOLD": False, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,
      "GAME_RECORD": True
@@ -114,6 +116,8 @@ def handler (agent_input, agent_output):
           printm(agent_input, "d")
           if (AGENT_MODE == 1):
                handler_random_agent (agent_input, agent_output)
+          elif (AGENT_MODE == 3):
+               handler_svm_agent (agent_input, agent_output)
           else:
                hold = input("ERROR unknown AGENT_MODE: %d." % AGENT_MODE)
                exit()
@@ -188,6 +192,15 @@ def handler_random_agent (agent_input, agent_output):
           agent_output["bid_to_add"]  = int(bid_to_add)
           agent_output["bid_to_exceed"] = 0 if (bid_to_add == 0) else (current_player["bid"] + agent_output["bid_to_add"] - agent_input["current_highest_bid"])
 
+def handler_svm_agent (agent_input, agent_output):
+     stage = agent_input["stage"]
+     if (stage == 1): # in Selling Stage
+          num = agent.predict(agent_input)
+          print(num)
+          hold = input("HOLD")
+     else: # in Bidding Stage
+          pass
+          
 ### Game ###
 
 def play ():
