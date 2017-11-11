@@ -3,11 +3,17 @@ import numpy as np
 from sklearn.externals import joblib
 from sklearn.preprocessing import StandardScaler
 import data_parser
-from sklearn import svm
+from sklearn.svm import SVC, NuSVC, LinearSVC 		# For Support Vector Machine
+from sklearn.neural_network import MLPClassifier 	# For Neural Network
+from sklearn.naive_bayes import GaussianNB			# For Naive Bayes
+from sklearn.tree import DecisionTreeClassifier  	# For Decision Tree
+from sklearn.linear_model import LinearRegression	# For Linear Regression
 
 featureNum = {"sell" : 51, "bid" : 65}
 modelTypes = {	"svm": "Support Vector Machine",
 				"nn" : "Neural Networ",
+				"nb" : "Naive Bayes",
+				"dt" : "Decision Tree",
 				"lr" : "Linear Regression" }
 
 def set_up_agents(model = "svm"):
@@ -20,6 +26,7 @@ def preprocess_feature(X):
 	scaler = StandardScaler().fit(X)
 	X = scaler.transform(X)	# Rescale the data
 	return X
+
 
 class SVMAgent:
 	def __init__(self, targetType = "sell"):
@@ -48,9 +55,159 @@ class SVMAgent:
 		# print y.shape
 
 		X = preprocess_feature(X)
-		# Train the Support Vector Machine model
-		model = svm.SVC()
-		model.fit(X,y)
+		# Train the Support Vector Machine model with different classes
+		model = SVC(kernel = 'linear').fit(X, y)
+		# model = SVC(kernel = 'rbf'	 ).fit(X, y)
+
+		# model = NuSVC(kernel = 'linear').fit(X,y)
+		# model = NuSVC(kernel = 'rbf'   ).fit(X,y)
+
+		# model = LinearSVC(multi_class = 'ovr').fit(X,y)
+		# model = LinearSVC(multi_class = 'crammer_singer').fit(X,y)
+
+		# Store the model
+		joblib.dump(model, self.modelPath)
+
+	def predict(self,agent_input):
+		feature = data_parser.parse_input(agent_input)
+		# print "Feature for prediction:\n"
+		# print feature
+		model = joblib.load(self.modelPath)
+		feature = preprocess_feature(feature)
+		predict = model.predict(feature)
+
+		return int(predict[0]) # return the decision
+
+
+class NNAgent:
+	def __init__(self, targetType = "sell"):
+
+		self.targetType = targetType
+		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
+		self.modelPath = "selling_model/nn.pkl" if targetType=='sell' else "bidding_model/nn.pkl"
+
+	def train(self):
+		# Parse the raw data to get the updated data
+		data_parser.parse_raw_data()
+		# Load data from the txt file
+		with open(self.dataPath, 'r') as file:
+			dataset = np.loadtxt(file, delimiter=" ")
+
+		num = featureNum[self.targetType]
+		X = dataset[:,0:num]	# Features
+		y = dataset[:,num]		# Target
+
+		X = preprocess_feature(X)
+		# Train the Neural Network model
+		model = MLPClassifier(solver='adam', activation='relu', hidden_layer_sizes = (10,), max_iter = 10000, alpha = 1e-5).fit(X, y)
+
+		# Store the model
+		joblib.dump(model, self.modelPath)
+
+	def predict(self,agent_input):
+		feature = data_parser.parse_input(agent_input)
+		# print "Feature for prediction:\n"
+		# print feature
+		model = joblib.load(self.modelPath)
+		feature = preprocess_feature(feature)
+		predict = model.predict(feature)
+
+		return int(predict[0]) # return the decision
+
+
+class NBAgent:
+	def __init__(self, targetType = "sell"):
+
+		self.targetType = targetType
+		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
+		self.modelPath = "selling_model/nb.pkl" if targetType=='sell' else "bidding_model/nb.pkl"
+
+	def train(self):
+		# Parse the raw data to get the updated data
+		data_parser.parse_raw_data()
+		# Load data from the txt file
+		with open(self.dataPath, 'r') as file:
+			dataset = np.loadtxt(file, delimiter=" ")
+
+		num = featureNum[self.targetType]
+		X = dataset[:,0:num]	# Features
+		y = dataset[:,num]		# Target
+
+		X = preprocess_feature(X)
+		# Train the Naive Bayes model
+		model = GaussianNB().fit(X, y)
+
+		# Store the model
+		joblib.dump(model, self.modelPath)
+
+	def predict(self,agent_input):
+		feature = data_parser.parse_input(agent_input)
+		# print "Feature for prediction:\n"
+		# print feature
+		model = joblib.load(self.modelPath)
+		feature = preprocess_feature(feature)
+		predict = model.predict(feature)
+
+		return int(predict[0]) # return the decision
+
+
+class DTAgent:
+	def __init__(self, targetType = "sell"):
+
+		self.targetType = targetType
+		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
+		self.modelPath = "selling_model/dt.pkl" if targetType=='sell' else "bidding_model/dt.pkl"
+
+	def train(self):
+		# Parse the raw data to get the updated data
+		data_parser.parse_raw_data()
+		# Load data from the txt file
+		with open(self.dataPath, 'r') as file:
+			dataset = np.loadtxt(file, delimiter=" ")
+
+		num = featureNum[self.targetType]
+		X = dataset[:,0:num]	# Features
+		y = dataset[:,num]		# Target
+
+		X = preprocess_feature(X)
+		# Train the Decision Tree model
+		model = DecisionTreeClassifier().fit(X, y)
+
+		# Store the model
+		joblib.dump(model, self.modelPath)
+
+	def predict(self,agent_input):
+		feature = data_parser.parse_input(agent_input)
+		# print "Feature for prediction:\n"
+		# print feature
+		model = joblib.load(self.modelPath)
+		feature = preprocess_feature(feature)
+		predict = model.predict(feature)
+
+		return int(predict[0]) # return the decision
+
+
+class LRAgent:
+	def __init__(self, targetType = "sell"):
+
+		self.targetType = targetType
+		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
+		self.modelPath = "selling_model/lr.pkl" if targetType=='sell' else "bidding_model/lr.pkl"
+
+	def train(self):
+		# Parse the raw data to get the updated data
+		data_parser.parse_raw_data()
+		# Load data from the txt file
+		with open(self.dataPath, 'r') as file:
+			dataset = np.loadtxt(file, delimiter=" ")
+
+		num = featureNum[self.targetType]
+		X = dataset[:,0:num]	# Features
+		y = dataset[:,num]		# Target
+
+		X = preprocess_feature(X)
+		# Train the Linear Regression model
+		model = LinearRegression().fit(X, y)
 
 		# Store the model
 		joblib.dump(model, self.modelPath)
@@ -67,11 +224,16 @@ class SVMAgent:
 
 
 if __name__ == "__main__":
-	sellAgent = SVMAgent(targetType = "sell")
+	# "svm": "Support Vector Machine",
+	# "nn" : "Neural Networ",
+	# "nb" : "Naive Bayes",
+	# "dt" : "Decision Tree",
+	# "lr" : "Linear Regression"
+	sellAgent = NBAgent(targetType = "sell")
 	sellAgent.train()
 	print "Selling Agent trainning done\n"
 
-	bidAgent = SVMAgent(targetType = "bid")
+	bidAgent = NBAgent(targetType = "bid")
 	bidAgent.train()
 	print "Bidding Agent trainning done\n"
 

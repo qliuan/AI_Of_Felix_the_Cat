@@ -108,13 +108,7 @@ def parse_input(agent_input):
 
 	feature = np.loadtxt("feature.txt", delimiter=" ")
 	num = featureNum[targetType]
-	print "feature: "
-	print feature.shape
-
 	X = feature.reshape(1,num) # Features
-
-	print "X: "
-	print X.shape
 
 	return X
 
