@@ -1,0 +1,88 @@
+## Bidding information
+0 1 6 0 0 10 10 10
+## Player information
+2
+13 0 0 2 1 1 1 1 1 1 1 1 1 1
+9 0 0 6 1 1 1 1 1 1 1 1 1 1
+15 0 0 0 1 1 1 1 1 1 1 1 1 1
+15 0 0 0 1 1 1 1 1 1 1 1 1 1
+## Decision
+8
+
+## Bidding information
+3 2 16 2 4 6 7 10
+## Player information
+2
+0 0 0 16 0 1 1 1 1 1 1 1 1 1
+19 0 1 0 1 1 0 1 1 1 1 1 1 1
+18 0 0 0 1 1 1 1 1 1 1 1 1 0
+1 8 1 0 1 0 1 1 1 1 1 1 1 1
+## Decision
+2
+
+## Bidding information
+1 4 0 1 0 2 10 10
+## Player information
+2
+22 0 0 0 0 1 0 1 1 1 0 1 1 1
+1 11 1 0 1 1 0 1 1 1 1 0 0 1
+1 7 0 0 1 0 1 1 1 1 1 0 1 0
+3 8 0 0 0 0 1 1 0 1 1 1 1 1
+## Decision
+1
+
+## Bidding information
+0 6 2 0 3 10 10 10
+## Player information
+2
+0 14 0 1 0 1 0 1 1 1 0 1 0 0
+0 11 0 2 0 1 0 1 1 0 1 0 0 1
+5 7 0 0 1 0 0 0 1 1 1 0 1 0
+9 8 0 0 0 0 1 1 0 1 1 0 1 0
+## Decision
+2
+
+## Bidding information
+3 7 4 1 2 1 10 10
+## Player information
+2
+0 14 0 2 0 1 0 0 1 1 0 1 0 0
+0 11 0 4 0 1 0 1 1 0 0 0 0 1
+8 7 0 0 0 0 0 0 1 1 1 0 1 0
+3 22 1 0 0 0 1 1 0 1 1 0 0 0
+## Decision
+2
+
+## Bidding information
+2 8 0 0 6 10 10 10
+## Player information
+2
+4 14 0 0 0 0 0 0 1 1 0 1 0 0
+7 11 0 0 0 1 0 1 1 0 0 0 0 0
+2 20 0 0 0 0 0 0 0 1 1 0 1 0
+3 22 0 0 0 0 0 1 0 1 1 0 0 0
+## Decision
+1
+
+## Bidding information
+1 9 2 0 4 10 10 10
+## Player information
+2
+7 14 0 0 0 0 0 0 0 1 0 1 0 0
+1 32 0 2 0 1 0 0 1 0 0 0 0 0
+4 20 0 0 0 0 0 0 0 1 0 0 1 0
+4 22 0 0 0 0 0 1 0 0 1 0 0 0
+## Decision
+1
+
+## Bidding information
+2 10 0 0 8 10 10 10
+## Player information
+2
+9 14 0 0 0 0 0 0 0 1 0 0 0 0
+6 32 0 0 0 1 0 0 0 0 0 0 0 0
+1 22 0 0 0 0 0 0 0 0 0 0 1 0
+5 22 0 0 0 0 0 1 0 0 0 0 0 0
+## Decision
+2
+

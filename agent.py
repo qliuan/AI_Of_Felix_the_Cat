@@ -1,4 +1,5 @@
 import numpy as np
+import random
 from sklearn.externals import joblib
 from sklearn.preprocessing import StandardScaler
 import data_parser
@@ -29,6 +30,28 @@ def preprocess_feature(X):
 	X = scaler.transform(X)	# Rescale the data
 	return X
 
+def check_bid(agent_input, pred):
+	player = agent_input['my_index']
+	cur_high = agent_input['current_highest_bid']
+	bid = agent_input['players_public'][player]['bid']
+	token = agent_input['players_public'][player]['token']
+	result = cur_high + pred - bid
+	if (cur_high + pred - bid > token):
+		# Random agent when the model fails
+		maxi = token - cur_high - bid
+		result = random.randint(0,maxi)
+	return result
+
+def check_sell(agent_input, pred):
+	player = agent_input['my_index']
+	decks = agent_input['players_public'][player]['show_deck_public']
+	result = TtoD[str(pred)]
+	if not result in decks:
+		size = len(decks)
+		result = decks[randomint(1,size)-1]
+	return result
+
+
 # Base class of all agents
 class Agent:
 	def __init__(self, targetType, modelPath):
@@ -46,9 +69,11 @@ class Agent:
 
 		# return the decision
 		if (self.targetType == 'bid'):
-			return int(predict[0])
+			result = check_bid(agent_input, int(predict[0]))
 		else:
-			return TtoD[str(int(predict[0]))]
+			result = check_sell(agent_input, int(predict[0]))
+
+		return result
 
 
 class SVMAgent(Agent):
@@ -190,7 +215,50 @@ class LRAgent(Agent):
 		joblib.dump(model, self.modelPath)
 
 
+def train_models():
+	# "svm": "Support Vector Machine",
+	# "nn" : "Neural Networ",
+	# "nb" : "Naive Bayes",
+	# "dt" : "Decision Tree",
+	# "lr" : "Linear Regression"
+
+	print("Training SVM model.")
+	sellSVMAgent = SVMAgent(targetType = "sell")
+	bidSVMAgent = SVMAgent(targetType = "bid")
+	sellSVMAgent.train()
+	bidSVMAgent.train()
+
+	print("Training NN model.")
+	sellNNAgent = NNAgent(targetType = "sell")
+	bidNNAgent = NNAgent(targetType = "bid")
+	sellNNAgent.train()
+	bidNNAgent.train()
+
+	print("Training NB model.")
+	sellNBAgent = NBAgent(targetType = "sell")
+	bidNBAgent = NBAgent(targetType = "bid")
+	sellNBAgent.train()
+	bidNBAgent.train()
+
+	print("Training DT model.")
+	sellDTAgent = DTAgent(targetType = "sell")
+	bidDTAgent = DTAgent(targetType = "bid")
+	sellDTAgent.train()
+	bidDTAgent.train()
+
+	print("Training LR model.")
+	sellLRAgent = LRAgent(targetType = "sell")
+	bidLRAgent = LRAgent(targetType = "bid")
+	sellLRAgent.train()
+	bidLRAgent.train()
+
+	print("Training of all models done.")
+
+
 if __name__ == "__main__":
+
+	train_models()
+
 	# "svm": "Support Vector Machine",
 	# "nn" : "Neural Networ",
 	# "nb" : "Naive Bayes",
@@ -204,7 +272,7 @@ if __name__ == "__main__":
 	# bidAgent.train()
 	# print("Bidding Agent trainning done\n")
 
-	inputDic = {'my_index': 0,
+	inputDic = {'my_index': 1,
 		'stage': 1,
 		'current_highest_bid': 8,
 		'starting_player_index': 3,

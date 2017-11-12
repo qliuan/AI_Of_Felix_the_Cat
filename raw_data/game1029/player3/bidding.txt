@@ -1,0 +1,110 @@
+## Bidding information
+0 2 17 1 6 5 10 10
+## Player information
+3
+1 -8 1 0 1 1 1 1 1 1 1 0 1 1
+1 0 0 15 1 1 1 1 1 1 1 1 0 1
+0 0 0 17 1 1 1 1 1 0 1 1 1 1
+18 0 0 0 1 1 1 1 1 1 1 0 1 1
+## Decision
+0
+
+## Bidding information
+2 3 0 1 9 0 10 10
+## Player information
+3
+1 -8 0 0 1 1 1 1 1 1 0 0 1 1
+19 0 0 0 1 1 1 1 1 0 1 1 0 1
+1 11 1 0 1 1 1 0 1 0 1 1 1 1
+20 0 0 0 1 0 1 1 1 1 1 0 1 1
+## Decision
+11
+
+## Bidding information
+2 3 15 2 9 0 1 10
+## Player information
+3
+3 -8 1 0 1 1 1 1 1 1 0 0 1 1
+4 0 0 15 1 1 1 1 1 0 1 1 0 1
+1 11 1 0 1 1 1 0 1 0 1 1 1 1
+9 0 0 11 1 0 1 1 1 1 1 0 1 1
+## Decision
+3
+
+## Bidding information
+3 4 0 0 9 10 10 10
+## Player information
+3
+3 -8 0 0 1 0 1 1 1 1 0 0 1 1
+22 0 0 0 1 1 1 0 1 0 1 1 0 1
+1 11 0 0 1 1 1 0 1 0 1 1 1 0
+2 8 0 0 0 0 1 1 1 1 1 0 1 1
+## Decision
+0
+
+## Bidding information
+1 5 0 2 9 6 8 10
+## Player information
+3
+6 -8 0 0 1 0 1 1 1 1 0 0 1 0
+2 -8 1 0 1 0 1 0 1 0 1 1 0 1
+5 11 1 0 1 1 1 0 1 0 1 0 1 0
+3 8 0 0 0 0 1 1 1 1 1 0 1 0
+## Decision
+3
+
+## Bidding information
+0 6 3 1 4 4 10 10
+## Player information
+3
+-1 -8 0 2 0 0 1 1 1 1 0 0 1 0
+3 -8 1 0 1 0 1 0 1 0 1 1 0 0
+2 11 0 3 1 1 1 0 1 0 0 0 1 0
+6 8 0 0 0 0 1 1 1 1 1 0 0 0
+## Decision
+2
+
+## Bidding information
+3 7 0 0 6 10 10 10
+## Player information
+3
+3 -8 0 0 0 0 1 1 0 1 0 0 1 0
+3 -8 0 0 1 0 1 0 0 0 1 1 0 0
+8 11 0 0 1 0 1 0 1 0 0 0 1 0
+1 51 0 0 0 0 0 1 1 1 1 0 0 0
+## Decision
+0
+
+## Bidding information
+2 9 0 1 2 3 10 10
+## Player information
+3
+1 16 0 0 0 0 1 0 0 1 0 0 0 0
+8 -8 0 0 0 0 1 0 0 0 1 0 0 0
+1 14 1 0 0 0 1 0 0 0 0 0 1 0
+4 51 0 0 0 0 0 1 1 0 0 0 0 0
+## Decision
+2
+
+## Bidding information
+2 9 3 2 2 3 5 10
+## Player information
+3
+3 16 1 0 0 0 1 0 0 1 0 0 0 0
+5 -8 0 3 0 0 1 0 0 0 1 0 0 0
+1 14 1 0 0 0 1 0 0 0 0 0 1 0
+2 51 0 2 0 0 0 1 1 0 0 0 0 0
+## Decision
+1
+
+## Bidding information
+1 10 2 1 6 8 10 10
+## Player information
+3
+3 16 0 0 0 0 1 0 0 0 0 0 0 0
+0 19 0 2 0 0 0 0 0 0 1 0 0 0
+2 14 1 0 0 0 0 0 0 0 0 0 1 0
+7 51 0 0 0 0 0 0 1 0 0 0 0 0
+## Decision
+0
+
