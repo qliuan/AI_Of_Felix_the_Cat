@@ -245,7 +245,7 @@ def handler_gen1_agent (agent_input, agent_output, agent_name):
           placeholder = "s" if (bid_to_add > 1) else ""
           printm("%s AGENT adds %d token%s." % (agent_name, bid_to_add, placeholder), "o")
           agent_output["bid_to_exceed"] = bid_to_exceed
-          agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else ()
+          agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else (0)
 
 ### Game ###
 
