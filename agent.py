@@ -1,4 +1,3 @@
-
 import numpy as np
 from sklearn.externals import joblib
 from sklearn.preprocessing import StandardScaler
@@ -16,6 +15,9 @@ modelTypes = {	"svm": "Support Vector Machine",
 				"dt" : "Decision Tree",
 				"lr" : "Linear Regression" }
 
+# Transform from Target to Deck
+TtoD = {'0':'+3','1': '+5','2': '+8','3': '+11','4': '+15','5': '0','6': '-5','7': '-8','8': 'dog','9': 'DOG'}
+
 def set_up_agents(model = "svm"):
 	sellAgent = SVMAgent("sell")
 	bidAgent = SVMsAgent("bid")
@@ -27,13 +29,35 @@ def preprocess_feature(X):
 	X = scaler.transform(X)	# Rescale the data
 	return X
 
+# Base class of all agents
+class Agent:
+	def __init__(self, targetType, modelPath):
+		# print("Init the base class")
+		self.targetType = targetType
+		self.modelPath = modelPath
 
-class SVMAgent:
+	def predict(self,agent_input):
+		feature = data_parser.parse_input(agent_input)
+		# print "Feature for prediction:\n"
+		# print feature
+		model = joblib.load(self.modelPath)
+		feature = preprocess_feature(feature)
+		predict = model.predict(feature)
+
+		# return the decision
+		if (self.targetType == 'bid'):
+			return int(predict[0])
+		else:
+			return TtoD[str(int(predict[0]))]
+
+
+class SVMAgent(Agent):
 	def __init__(self, targetType = "sell"):
-
+		# print("Init the derived class")
 		self.targetType = targetType
 		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
 		self.modelPath = "selling_model/svm.pkl" if targetType=='sell' else "bidding_model/svm.pkl"
+		Agent.__init__(self, self.targetType, self.modelPath)
 
 	def train(self):
 		# Parse the raw data to get the updated data
@@ -45,14 +69,6 @@ class SVMAgent:
 		num = featureNum[self.targetType]
 		X = dataset[:,0:num]	# Features
 		y = dataset[:,num]		# Target
-
-		# print "dataset: "
-		# print dataset.shape
-		# print "X: "
-		# print X.shape
-		# print type(X)
-		# print "y:"
-		# print y.shape
 
 		X = preprocess_feature(X)
 		# Train the Support Vector Machine model with different classes
@@ -68,23 +84,13 @@ class SVMAgent:
 		# Store the model
 		joblib.dump(model, self.modelPath)
 
-	def predict(self,agent_input):
-		feature = data_parser.parse_input(agent_input)
-		# print "Feature for prediction:\n"
-		# print feature
-		model = joblib.load(self.modelPath)
-		feature = preprocess_feature(feature)
-		predict = model.predict(feature)
 
-		return int(predict[0]) # return the decision
-
-
-class NNAgent:
+class NNAgent(Agent):
 	def __init__(self, targetType = "sell"):
-
 		self.targetType = targetType
 		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
 		self.modelPath = "selling_model/nn.pkl" if targetType=='sell' else "bidding_model/nn.pkl"
+		Agent.__init__(self, self.targetType, self.modelPath)
 
 	def train(self):
 		# Parse the raw data to get the updated data
@@ -104,23 +110,13 @@ class NNAgent:
 		# Store the model
 		joblib.dump(model, self.modelPath)
 
-	def predict(self,agent_input):
-		feature = data_parser.parse_input(agent_input)
-		# print "Feature for prediction:\n"
-		# print feature
-		model = joblib.load(self.modelPath)
-		feature = preprocess_feature(feature)
-		predict = model.predict(feature)
 
-		return int(predict[0]) # return the decision
-
-
-class NBAgent:
+class NBAgent(Agent):
 	def __init__(self, targetType = "sell"):
-
 		self.targetType = targetType
 		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
 		self.modelPath = "selling_model/nb.pkl" if targetType=='sell' else "bidding_model/nb.pkl"
+		Agent.__init__(self, self.targetType, self.modelPath)
 
 	def train(self):
 		# Parse the raw data to get the updated data
@@ -140,23 +136,13 @@ class NBAgent:
 		# Store the model
 		joblib.dump(model, self.modelPath)
 
-	def predict(self,agent_input):
-		feature = data_parser.parse_input(agent_input)
-		# print "Feature for prediction:\n"
-		# print feature
-		model = joblib.load(self.modelPath)
-		feature = preprocess_feature(feature)
-		predict = model.predict(feature)
 
-		return int(predict[0]) # return the decision
-
-
-class DTAgent:
+class DTAgent(Agent):
 	def __init__(self, targetType = "sell"):
-
 		self.targetType = targetType
 		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
 		self.modelPath = "selling_model/dt.pkl" if targetType=='sell' else "bidding_model/dt.pkl"
+		Agent.__init__(self, self.targetType, self.modelPath)
 
 	def train(self):
 		# Parse the raw data to get the updated data
@@ -176,23 +162,14 @@ class DTAgent:
 		# Store the model
 		joblib.dump(model, self.modelPath)
 
-	def predict(self,agent_input):
-		feature = data_parser.parse_input(agent_input)
-		# print "Feature for prediction:\n"
-		# print feature
-		model = joblib.load(self.modelPath)
-		feature = preprocess_feature(feature)
-		predict = model.predict(feature)
-
-		return int(predict[0]) # return the decision
 
 
-class LRAgent:
+class LRAgent(Agent):
 	def __init__(self, targetType = "sell"):
-
 		self.targetType = targetType
 		self.dataPath = "sellingData.txt" if targetType=='sell' else "biddingData.txt"
 		self.modelPath = "selling_model/lr.pkl" if targetType=='sell' else "bidding_model/lr.pkl"
+		Agent.__init__(self, self.targetType, self.modelPath)
 
 	def train(self):
 		# Parse the raw data to get the updated data
@@ -212,16 +189,6 @@ class LRAgent:
 		# Store the model
 		joblib.dump(model, self.modelPath)
 
-	def predict(self,agent_input):
-		feature = data_parser.parse_input(agent_input)
-		# print "Feature for prediction:\n"
-		# print feature
-		model = joblib.load(self.modelPath)
-		feature = preprocess_feature(feature)
-		predict = model.predict(feature)
-
-		return int(predict[0]) # return the decision
-
 
 if __name__ == "__main__":
 	# "svm": "Support Vector Machine",
@@ -230,12 +197,12 @@ if __name__ == "__main__":
 	# "dt" : "Decision Tree",
 	# "lr" : "Linear Regression"
 	sellAgent = NBAgent(targetType = "sell")
-	sellAgent.train()
-	print "Selling Agent trainning done\n"
+	# sellAgent.train()
+	# print("Selling Agent trainning done\n")
 
 	bidAgent = NBAgent(targetType = "bid")
-	bidAgent.train()
-	print "Bidding Agent trainning done\n"
+	# bidAgent.train()
+	# print("Bidding Agent trainning done\n")
 
 	inputDic = {'my_index': 0,
 		'stage': 1,
@@ -259,6 +226,6 @@ if __name__ == "__main__":
 	inputDic["stage"] = 2
 	bid = bidAgent.predict(inputDic)
 
-	print "Sell: " + str(sell) + "\nBid: " + str(bid) + "\n"
+	print("Sell: " + sell + "\nBid: " + str(bid) + "\n")
 
 

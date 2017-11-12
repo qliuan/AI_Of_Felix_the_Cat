@@ -18,7 +18,7 @@ DASHBOARD = {
      # when AGENT_MODE == 3
      # svm, nn, nb, dt, lr
 
-     "PRINT_MODE": "a",
+     "PRINT_MODE": "r",
      # a: All / Always
      # g: Gameplay Title and Winning Statistics
      # t: Title
@@ -28,11 +28,11 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-     "NUM_OF_GAME_PLAY": 10,
+     "NUM_OF_GAME_PLAY": 100,
      "AUTO_REPLAY": False,
      "HOLD": False, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,
-     "GAME_RECORD": True
+     "GAME_RECORD": False
 }
 
 WIN_COUNTS = []
@@ -186,7 +186,7 @@ def handler_random_agent (agent_input, agent_output):
      stage = agent_input["stage"]
      if (stage == 1): # in Selling Stage
           card_to_sell = random.choice(show_deck(agent_input["my_deck"]))
-          printm("RANDOM AGENT sells %s." % card_to_sell, "o") 
+          printm("RANDOM AGENT sells %s." % card_to_sell, "o")
           agent_output["card_to_sell"] = card_to_sell
      else: # in Bidding Stage
           min_bid_to_add = agent_input["current_highest_bid"] - current_player["bid"] + 1
@@ -218,20 +218,20 @@ def handler_gen1_agent (agent_input, agent_output, agent_name):
      current_player = agent_input["players_public"][agent_input["my_index"]]
      stage = agent_input["stage"]
      if (agent_name == "svm"):
-          sell_agent = SVMAgent(targetType = "sell")
-          bid_agent = SVMAgent(targetType = "bid")
+          sell_agent = agent.SVMAgent(targetType = "sell")
+          bid_agent = agent.SVMAgent(targetType = "bid")
      elif (agent_name == "nn"):
-          sell_agent = NNAgent(targetType = "sell")
-          bid_agent = NNAgent(targetType = "bid")
+          sell_agent = agent.NNAgent(targetType = "sell")
+          bid_agent = agent.NNAgent(targetType = "bid")
      elif (agent_name == "nb"):
-          sell_agent = NBAgent(targetType = "sell")
-          bid_agent = NBAgent(targetType = "bid")
+          sell_agent = agent.NBAgent(targetType = "sell")
+          bid_agent = agent.NBAgent(targetType = "bid")
      elif (agent_name == "dt"):
-          sell_agent = DTAgent(targetType = "sell")
-          bid_agent = DTAgent(targetType = "bid")
+          sell_agent = agent.DTAgent(targetType = "sell")
+          bid_agent = agent.DTAgent(targetType = "bid")
      elif (agent_name == "lr"):
-          sell_agent = LRAgent(targetType = "sell")
-          bid_agent = LRAgent(targetType = "bid")
+          sell_agent = agent.LRAgent(targetType = "sell")
+          bid_agent = agent.LRAgent(targetType = "bid")
      else:
           hold = input("ERROR unknown AGENT_NAME: %s." % agent_name)
           exit()
@@ -240,7 +240,7 @@ def handler_gen1_agent (agent_input, agent_output, agent_name):
           printm("%s AGENT sells %s." % (agent_name, card_to_sell), "o")
           agent_output["card_to_sell"] = card_to_sell
      else: # in Bidding Stage
-          bid_to_exceed = bid_agent_predict(agent_input)
+          bid_to_exceed = bid_agent.predict(agent_input)
           bid_to_add = 0 if (bid_to_exceed == 0) else (bid_to_exceed + agent_input["current_highest_bid"] - current_player["bid"])
           placeholder = "s" if (bid_to_add > 1) else ""
           printm("%s AGENT adds %d token%s." % (agent_name, bid_to_add, placeholder), "o")
@@ -250,7 +250,7 @@ def handler_gen1_agent (agent_input, agent_output, agent_name):
 ### Game ###
 
 def play ():
-     
+
      AGENT_MODE = DASHBOARD["AGENT_MODE"]
      PRINT_MODE = DASHBOARD["PRINT_MODE"]
      NUM_OF_GAME_PLAY = DASHBOARD["NUM_OF_GAME_PLAY"]
@@ -325,7 +325,7 @@ def play ():
      }
 
      # Game Loop #
-     
+
      if (WIN_RATE_COUNT):
           for _ in range(num_of_player):
                WIN_COUNTS.append(0)
@@ -499,9 +499,9 @@ def play ():
                          # receive the reward
                          reward = skip_rewards[reward_pointer]
                          current_player["token"] += reward
-                         
+
                          placeholder = "s" if (reward > 1) else ""
-                         
+
                          printm("You receive a skip reward of %d token%s." % (reward, placeholder), "o")
                          reward_pointer += 1
                          central_series_revealed_length += 1
@@ -582,7 +582,7 @@ def play ():
                if (replay != "y"):
                     break
 
-     if (WIN_RATE_COUNT):     
+     if (WIN_RATE_COUNT):
           printm("\n###### WINNING STATISTICS ######", "g")
           total_game_play = game_play + 1
           printm("Total game play: %d" % total_game_play, "g")

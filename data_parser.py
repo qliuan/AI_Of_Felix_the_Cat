@@ -64,6 +64,11 @@ def empty_data(path):
 
 def parse_input(agent_input):
 	featureStr = ""
+
+	print("Parsing Test:")
+	print(agent_input)
+	x = raw_input("Enter")
+
 	if(agent_input['stage'] == 1):
 		## Selling stage
 		targetType = 'sell'
@@ -101,7 +106,7 @@ def parse_input(agent_input):
 			featureStr += str(BtoI[ str( 'dog' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " "
 			featureStr += str(BtoI[ str( 'DOG' in agent_input['players_public'][i]['show_deck_public'] ) ]) + " "
 
-	# print "Feature String:\n" + featureStr.rstrip()
+	print "Feature String:\n" + featureStr.rstrip()
 
 	with open("feature.txt", 'w') as file:
 		file.write(featureStr.rstrip())
@@ -137,5 +142,5 @@ def test():
 	parse_input(inputDic)
 
 if __name__ == '__main__':
-	parse_raw_data()
-	# test()
+	# parse_raw_data()
+	test()
