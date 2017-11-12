@@ -18,7 +18,7 @@ DASHBOARD = {
      # when AGENT_MODE == 3
      # svm, nn, nb, dt, lr
 
-     "PRINT_MODE": "r",
+     "PRINT_MODE": "g",
      # a: All / Always
      # g: Gameplay Title and Winning Statistics
      # t: Title
@@ -29,7 +29,7 @@ DASHBOARD = {
      # d: Debug
 
      "NUM_OF_GAME_PLAY": 100,
-     "AUTO_REPLAY": False,
+     "AUTO_REPLAY": True,
      "HOLD": False, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,
      "GAME_RECORD": False

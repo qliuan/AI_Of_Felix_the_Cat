@@ -1,0 +1,110 @@
+## Round information
+0 1
+## Player information
+2
+15 0 1 1 1 1 1 1 1 1 1 1
+15 0 1 1 1 1 1 1 1 1 1 1
+15 0 1 1 1 1 1 1 1 1 1 1
+15 0 1 1 1 1 1 1 1 1 1 1
+## Decision
+8
+
+## Round information
+1 2
+## Player information
+2
+18 0 1 1 0 1 1 1 1 1 1 1
+-1 11 0 1 1 1 1 1 1 1 1 1
+16 0 1 1 1 1 1 1 1 1 0 1
+17 0 1 1 1 1 1 0 1 1 1 1
+## Decision
+5
+
+## Round information
+0 3
+## Player information
+2
+1 5 1 1 0 1 1 1 1 1 0 1
+0 11 0 0 1 1 1 1 1 1 1 1
+18 0 1 1 1 1 1 0 1 1 0 1
+20 0 1 1 1 1 1 0 0 1 1 1
+## Decision
+6
+
+## Round information
+3 4
+## Player information
+2
+2 5 1 1 0 1 1 1 1 0 0 1
+2 11 0 0 1 0 1 1 1 1 1 1
+21 0 1 1 1 1 1 0 0 1 0 1
+2 6 1 1 1 1 1 0 0 1 0 1
+## Decision
+4
+
+## Round information
+2 5
+## Player information
+2
+3 5 1 1 0 1 1 1 0 0 0 1
+4 11 0 0 1 0 1 1 1 0 1 1
+12 -13 1 1 1 1 0 0 0 1 0 1
+5 6 1 1 1 1 1 0 0 1 0 0
+## Decision
+9
+
+## Round information
+2 6
+## Player information
+2
+5 5 0 1 0 1 1 1 0 0 0 1
+7 11 0 0 1 0 1 1 1 0 1 0
+0 -10 1 1 1 1 0 0 0 1 0 0
+6 6 1 1 1 0 1 0 0 1 0 0
+## Decision
+0
+
+## Round information
+1 7
+## Player information
+2
+7 5 0 1 0 1 1 1 0 0 0 0
+2 6 0 0 0 0 1 1 1 0 1 0
+1 -10 0 1 1 1 0 0 0 1 0 0
+9 6 1 1 1 0 1 0 0 0 0 0
+## Decision
+3
+
+## Round information
+3 8
+## Player information
+2
+10 5 0 1 0 1 1 0 0 0 0 0
+4 6 0 0 0 0 1 0 1 0 1 0
+2 -10 0 1 1 0 0 0 0 1 0 0
+1 20 0 1 1 0 1 0 0 0 0 0
+## Decision
+1
+
+## Round information
+0 9
+## Player information
+2
+0 20 0 0 0 1 1 0 0 0 0 0
+5 6 0 0 0 0 1 0 1 0 0 0
+4 -10 0 0 1 0 0 0 0 1 0 0
+4 20 0 0 1 0 1 0 0 0 0 0
+## Decision
+2
+
+## Round information
+3 10
+## Player information
+2
+1 20 0 0 0 0 1 0 0 0 0 0
+7 6 0 0 0 0 1 0 0 0 0 0
+7 -10 0 0 0 0 0 0 0 1 0 0
+-1 42 0 0 0 0 1 0 0 0 0 0
+## Decision
+7
+
