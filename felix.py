@@ -4,19 +4,20 @@ import game_recorder # recording decisions
 import agent
 
 # TO-DOs
-# 1. distinguished agents for players
-# 2. design naive agent
+# 1. design naive agent
 
 DASHBOARD = {
-     "AGENT_MODE": 3,
+     "NUM_OF_PLAYER": 4,
+     
+     "AGENT_MODES": [3, 1, 1, 1], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
      # 3: gen1_agent (svm_agent / nn_agent / nb_agent / dt_agent / lr_agent)
 
-     "AGENT_NAME": "svm",
-     # when AGENT_MODE == 3
-     # svm, nn, nb, dt, lr
+     "AGENT_NAMES": ["svm", "", "", ""], # must be of length NUM_OF_PLAYER
+     # when corresponding AGENT_MODE == 3, "svm"/"nn"/"nb"/"dt"/"lr"
+     # else, leave it as ""
 
      "PRINT_MODE": "g",
      # a: All / Always
@@ -36,6 +37,7 @@ DASHBOARD = {
 }
 
 WIN_COUNTS = []
+AGENT_WAREHOUSE = {}
 
 # Console Display Set-up #
 
@@ -116,22 +118,22 @@ def player_info_game_over (player):
 ### Agent Functions ###
 
 def handler (agent_input, agent_output):
-     AGENT_MODE = DASHBOARD["AGENT_MODE"]
-     AGENT_NAME = DASHBOARD["AGENT_NAME"]
+     my_index = agent_input["my_index"]
+     my_agent_mode = DASHBOARD["AGENT_MODES"][my_index]
      HOLD = DASHBOARD["HOLD"]
-     if (AGENT_MODE == 0):
+     if (my_agent_mode == 0):
           handler_manual (agent_input, agent_output)
      else:
           printm("INPUT DEBUG: ", "d")
           printm(agent_input, "d")
-          if (AGENT_MODE == 1):
+          if (my_agent_mode == 1):
                handler_random_agent (agent_input, agent_output)
-          elif (AGENT_MODE == 2):
+          elif (my_agent_mode == 2):
                handler_naive_agent (agent_input, agent_output)
-          elif (AGENT_MODE == 3):
-               handler_gen1_agent (agent_input, agent_output, AGENT_NAME)
+          elif (my_agent_mode == 3):
+               handler_gen1_agent (agent_input, agent_output)
           else:
-               hold = input("ERROR unknown AGENT_MODE: %d." % AGENT_MODE)
+               hold = input("ERROR unknown AGENT_MODE: %d." % my_agent_mode)
                exit()
           if (HOLD):
                hold = input("Press any key to continue...")
@@ -214,50 +216,64 @@ def handler_naive_agent (agent_input, agent_output):
      else: # in Bidding Stage
           pass
 
-def handler_gen1_agent (agent_input, agent_output, agent_name):
+def handler_gen1_agent (agent_input, agent_output):
+     my_index = agent_input["my_index"]
+     my_agent_name = DASHBOARD["AGENT_NAMES"][my_index]
      current_player = agent_input["players_public"][agent_input["my_index"]]
      stage = agent_input["stage"]
-     if (agent_name == "svm"):
-          sell_agent = agent.SVMAgent(targetType = "sell")
-          bid_agent = agent.SVMAgent(targetType = "bid")
-     elif (agent_name == "nn"):
-          sell_agent = agent.NNAgent(targetType = "sell")
-          bid_agent = agent.NNAgent(targetType = "bid")
-     elif (agent_name == "nb"):
-          sell_agent = agent.NBAgent(targetType = "sell")
-          bid_agent = agent.NBAgent(targetType = "bid")
-     elif (agent_name == "dt"):
-          sell_agent = agent.DTAgent(targetType = "sell")
-          bid_agent = agent.DTAgent(targetType = "bid")
-     elif (agent_name == "lr"):
-          sell_agent = agent.LRAgent(targetType = "sell")
-          bid_agent = agent.LRAgent(targetType = "bid")
+     if (my_agent_name in AGENT_WAREHOUSE):
+          if (stage == 1): # in Selling Stage
+               card_to_sell = AGENT_WAREHOUSE[my_agent_name]["sell"].predict(agent_input)
+               printm("%s AGENT sells %s." % (my_agent_name, card_to_sell), "o")
+               agent_output["card_to_sell"] = card_to_sell
+          else: # in Bidding Stage
+               bid_to_exceed = AGENT_WAREHOUSE[my_agent_name]["bid"].predict(agent_input)
+               bid_to_add = 0 if (bid_to_exceed == 0) else (bid_to_exceed + agent_input["current_highest_bid"] - current_player["bid"])
+               placeholder = "s" if (bid_to_add > 1) else ""
+               printm("%s AGENT adds %d token%s." % (my_agent_name, bid_to_add, placeholder), "o")
+               agent_output["bid_to_exceed"] = bid_to_exceed
+               agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else 0
      else:
-          hold = input("ERROR unknown AGENT_NAME: %s." % agent_name)
+          hold = input("ERROR unknown agent name: %s." % my_agent_name)
           exit()
-     if (stage == 1): # in Selling Stage
-          card_to_sell = sell_agent.predict(agent_input)
-          printm("%s AGENT sells %s." % (agent_name, card_to_sell), "o")
-          agent_output["card_to_sell"] = card_to_sell
-     else: # in Bidding Stage
-          bid_to_exceed = bid_agent.predict(agent_input)
-          bid_to_add = 0 if (bid_to_exceed == 0) else (bid_to_exceed + agent_input["current_highest_bid"] - current_player["bid"])
-          placeholder = "s" if (bid_to_add > 1) else ""
-          printm("%s AGENT adds %d token%s." % (agent_name, bid_to_add, placeholder), "o")
-          agent_output["bid_to_exceed"] = bid_to_exceed
-          agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else (0)
 
 ### Game ###
 
 def play ():
 
-     AGENT_MODE = DASHBOARD["AGENT_MODE"]
      PRINT_MODE = DASHBOARD["PRINT_MODE"]
      NUM_OF_GAME_PLAY = DASHBOARD["NUM_OF_GAME_PLAY"]
      AUTO_REPLAY = DASHBOARD["AUTO_REPLAY"]
      WIN_RATE_COUNT = DASHBOARD["WIN_RATE_COUNT"]
      GAME_RECORD= DASHBOARD["GAME_RECORD"]
+     NUM_OF_PLAYER = DASHBOARD["NUM_OF_PLAYER"]
 
+     # AGENT_WAREHOUSE Set-up #
+     
+     for agent_name in DASHBOARD["AGENT_NAMES"]:
+          if (agent_name == ""):
+               continue
+          elif (agent_name not in AGENT_WAREHOUSE):
+               AGENT_WAREHOUSE[agent_name] = {}
+               if (agent_name == "svm"):
+                    AGENT_WAREHOUSE[agent_name]["sell"] = agent.SVMAgent(targetType = "sell")
+                    AGENT_WAREHOUSE[agent_name]["bid"] = agent.SVMAgent(targetType = "bid")
+               elif (agent_name == "nn"):
+                    AGENT_WAREHOUSE[agent_name]["sell"] = agent.NNAgent(targetType = "sell")
+                    AGENT_WAREHOUSE[agent_name]["bid"] = agent.NNAgent(targetType = "bid")
+               elif (agent_name == "nb"):
+                    AGENT_WAREHOUSE[agent_name]["sell"] = agent.NBAgent(targetType = "sell")
+                    AGENT_WAREHOUSE[agent_name]["bid"] = agent.NBAgent(targetType = "bid")
+               elif (agent_name == "dt"):
+                    AGENT_WAREHOUSE[agent_name]["sell"] = agent.DTAgent(targetType = "sell")
+                    AGENT_WAREHOUSE[agent_name]["bid"] = agent.DTAgent(targetType = "bid")
+               elif (agent_name == "lr"):
+                    AGENT_WAREHOUSE[agent_name]["sell"] = agent.LRAgent(targetType = "sell")
+                    AGENT_WAREHOUSE[agent_name]["bid"] = agent.LRAgent(targetType = "bid")
+               else:
+                    del AGENT_WAREHOUSE[agent_name]
+                    hold = input("ERROR unknown agent name: %s." % agent_name)
+               
      # Game Rules Set-up #
 
      default_deck_value = { # dictionary <string, int>
@@ -282,7 +298,7 @@ def play ():
      default_token = 15
      max_bid = 2
      skip_rewards = [1, 2, 3, 4] # length must not exceed num_of_player
-     num_of_player = 4
+     num_of_player = NUM_OF_PLAYER
 
      # Player Template Set-up #
 
@@ -296,7 +312,7 @@ def play ():
      }
 
      # Agent Template Set-up #
-
+     
      agent_input_template = {
           "my_index": -1, # index of current player
           "rule_total_round": total_round,
