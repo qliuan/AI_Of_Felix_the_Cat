@@ -9,17 +9,17 @@ import agent
 DASHBOARD = {
      "NUM_OF_PLAYER": 4,
      
-     "AGENT_MODES": [1, 1, 1, 1], # must be of length NUM_OF_PLAYER
+     "AGENT_MODES": [2, 1, 3, 3], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
      # 3: gen1_agent (svm_agent / nn_agent / nb_agent / dt_agent / lr_agent)
 
-     "AGENT_NAMES": ["svm", "", "", ""], # must be of length NUM_OF_PLAYER
+     "AGENT_NAMES": ["", "", "svm", "nb"], # must be of length NUM_OF_PLAYER
      # when corresponding AGENT_MODE == 3, "svm"/"nn"/"nb"/"dt"/"lr"
      # else, leave it as ""
 
-     "PRINT_MODE": "a",
+     "PRINT_MODE": "g",
      # a: All / Always
      # g: Gameplay Title and Winning Statistics
      # t: Title
@@ -30,8 +30,8 @@ DASHBOARD = {
      # d: Debug
 
      "NUM_OF_GAME_PLAY": 100,
-     "AUTO_REPLAY": False,
-     "HOLD": True, # hold at the end of the agent function,
+     "AUTO_REPLAY": True,
+     "HOLD": False, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,
      "GAME_RECORD": False
 }
@@ -145,38 +145,38 @@ def handler_manual (agent_input, agent_output):
      stage = agent_input["stage"]
      if (stage == 1): # in Selling Stage
           # possible conditions
-          card_to_sell = input("Please choose a card to sell: ")
+          card_to_sell = raw_input("Please choose a card to sell: ")
           invalid_card = (card_to_sell not in agent_input["my_deck"])
           played_card = (not invalid_card) and (agent_input["my_deck"][card_to_sell] == False)
           while (invalid_card or played_card):
                print("You don't have %s." % card_to_sell)
-               card_to_sell = input("Please choose a card to sell: ")
+               card_to_sell = raw_input("Please choose a card to sell: ")
                # recompute possible conditions
                invalid_card = (card_to_sell not in agent_input["my_deck"])
                played_card = (not invalid_card) and (agent_input["my_deck"][card_to_sell] == False)
           agent_output["card_to_sell"] = card_to_sell
      else: # in Bidding Stage
-          bid_to_add = input("Please decide the bid to add (input 0 to skip): ")
+          bid_to_add = raw_input("Please decide the bid to add (input 0 to skip): ")
           # possible conditions
-          numeric = bid_to_add.isnumeric()
+          numeric = bid_to_add.isdigit()
           skip = numeric and (int(bid_to_add) == 0)
           negative_input = numeric and (int(bid_to_add) < 0)
           weak_bid = numeric and (current_player["bid"] + int(bid_to_add) <= agent_input["current_highest_bid"]) and (not skip)
           insufficient_token = numeric and (int(bid_to_add) > current_player["token"])
           while ((not numeric) or negative_input or weak_bid or insufficient_token):
                if (not numeric):
-                    bid_to_add = input("Please input a number: ")
+                    bid_to_add = raw_input("Please input a number: ")
                elif (negative_input):
-                    bid_to_add = input("Please input a non-negative number: ")
+                    bid_to_add = raw_input("Please input a non-negative number: ")
                elif (weak_bid):
                     print("Your bid (%d) cannot beat the highest bid (%d)." % \
                           (current_player["bid"] + int(bid_to_add), agent_input["current_highest_bid"]))
-                    bid_to_add = input("Please decide the bid to add (input 0 to skip): ")
+                    bid_to_add = raw_input("Please decide the bid to add (input 0 to skip): ")
                else: # insufficient_token
                     print("You don't have enough tokens (%d)!" % current_player["token"])
-                    bid_to_add = input("Please decide the bid to add (input 0 to skip): ")
+                    bid_to_add = raw_input("Please decide the bid to add (input 0 to skip): ")
                 # recompute possible conditions
-               numeric = bid_to_add.isnumeric()
+               numeric = bid_to_add.isdigit()
                skip = numeric and (int(bid_to_add) == 0)
                negative_input = numeric and (int(bid_to_add) < 0)
                weak_bid = numeric and (current_player["bid"] + int(bid_to_add) <= agent_input["current_highest_bid"]) and (not skip)
@@ -207,14 +207,120 @@ def handler_random_agent (agent_input, agent_output):
           agent_output["bid_to_add"]  = bid_to_add
           agent_output["bid_to_exceed"] =  bid_to_exceed
 
-# NOT FINISHED!
 def handler_naive_agent (agent_input, agent_output):
      current_player = agent_input["players_public"][agent_input["my_index"]]
      stage = agent_input["stage"]
+     card_assessment = { # dictionary <string, string>
+          "+15": "good",
+          "+11": "good",
+          "+8" : "good",
+          "+5" : "fair",
+          "+3" : "fair",
+          "0"  : "fair",
+          "-5" : "bad",
+          "-8" : "bad",
+          "DOG": "bad",
+          "dog": "good"
+     }
+     my_show_deck = show_deck(agent_input["my_deck"])
+     my_show_deck_public = agent_input['players_public'][agent_input["my_index"]]["show_deck_public"]
      if (stage == 1): # in Selling Stage
-          pass
+          # Token Ranks
+          tokens = []
+          for player in agent_input["players_public"]:
+               tokens.append(player["token"])
+          token_ranks = [0] * len(tokens)
+          for i, x in enumerate(sorted(range(len(tokens)), key=lambda y: tokens[y])):
+               token_ranks[x] = len(tokens) - i
+          my_token_rank = token_ranks[agent_input["my_index"]]
+          # Classified Cards
+          classified_cards = { # dictionary <string, array of string>
+               "good": [],
+               "fair": [],
+               "bad": []
+
+          } 
+          for card in my_show_deck:
+               card_class = card_assessment[card]
+               if (card_class not in classified_cards):
+                    classified_cards[card_class] = []
+               else:
+                    classified_cards[card_class].append(card)
+          # Candidate Cards
+          candidate_cards = []
+          second_candidate_cards = []
+          if (my_token_rank == 1):
+               candidate_cards = classified_cards["good"]
+               candidate_cards += ["dog"] if ("dog" in my_show_deck) else []
+               second_candidate_cards = classified_cards["fair"]
+          elif (my_token_rank == len(tokens)):
+               candidate_cards = classified_cards["bad"]
+               candidate_cards += ["DOG"] if ("DOG" in my_show_deck) else []
+               second_candidate_cards = classified_cards["fair"]
+          else:
+               candidate_cards = classified_cards["fair"]
+               candidate_cards += ["dog"] if ("dog" in my_show_deck) else []
+               candidate_cards += ["DOG"] if ("DOG" in my_show_deck) else []
+               second_candidate_cards = classified_cards["good"] + classified_cards["bad"]
+          # Card to Sell
+          if (len(candidate_cards) != 0):
+               card_to_sell = random.choice(candidate_cards)
+          elif (len(second_candidate_cards) != 0):
+               card_to_sell = random.choice(second_candidate_cards)
+          else:
+               card_to_sell = random.choice(my_show_deck)
+          printm("NAIVE AGENT sells %s." % card_to_sell, "o")
+          agent_output["card_to_sell"] = card_to_sell
      else: # in Bidding Stage
-          pass
+          # My Sold Card
+          my_sold_cards = list(set(my_show_deck_public) - set(my_show_deck))
+          if (len(my_sold_cards) != 1):
+               print("ERROR in agent_input: invalid difference between show_deck and show_deck_public.")
+               print(my_show_deck)
+               print(my_show_deck_public)
+               exit()
+          my_sold_card = my_sold_cards[0]
+          # Assessment
+          if (my_sold_card not in card_assessment):
+               print("ERROR unrecognized card: %s." % my_sold_card)
+               exit() 
+          assessment = card_assessment[my_sold_card]
+          # Bidding Strategy
+          bidding_strategy = "" # yearn, stay, skip
+          bidding_strategy_para = 2
+          random_pick = random.randint(0, bidding_strategy_para)
+          if (assessment == "good"): # yearn:stay = bidding_strategy_para
+               if (random_pick == 0):
+                    bidding_strategy = "stay"
+               else:
+                    bidding_strategy = "yearn"
+          elif (assessment == "fair"): # stay
+               bidding_strategy = "stay"
+          elif (assessment == "bad"):# skip : stay = bidding_strategy_para
+               if (random_pick == 0):
+                    bidding_strategy = "stay"
+               else:
+                    bidding_strategy = "skip"
+          else:
+               print("ERROR unrecognized assessment: %s." % assessment)
+               exit()
+          # Bid to Add
+          if (bidding_strategy == "yearn"):
+               bid_to_add = min(
+                    [
+                         agent_input["current_highest_bid"] - current_player["bid"] + agent_input["rule_max_bid"],
+                         current_player["token"]
+                    ]
+               )
+          elif (bidding_strategy == "stay"):
+               bid_to_add = agent_input["current_highest_bid"] - current_player["bid"] + 1
+          elif (bidding_strategy == "skip"):
+               bid_to_add = 0
+          placeholder = "s" if (bid_to_add > 1) else ""
+          printm("NAIVE AGENT adds %d token%s." % (bid_to_add, placeholder), "o")
+          bid_to_exceed = 0 if (bid_to_add == 0) else (bid_to_add + current_player["bid"] - agent_input["current_highest_bid"])
+          agent_output["bid_to_add"]  = bid_to_add
+          agent_output["bid_to_exceed"] =  bid_to_exceed
 
 def handler_gen1_agent (agent_input, agent_output):
      my_index = agent_input["my_index"]
@@ -452,6 +558,7 @@ def play ():
 
                     current_player_index = (current_player_index + 1) % num_of_player
                     current_player = players[current_player_index]
+                    current_deck = current_player["deck"]
 
                     if (current_player["skipped"]):
                          continue
@@ -594,7 +701,7 @@ def play ():
           # Replay #
 
           if (not AUTO_REPLAY):
-               replay = input("\nNext game? (y/n) ")
+               replay = raw_input("\nNext game? (y/n) ")
                if (replay != "y"):
                     break
 
