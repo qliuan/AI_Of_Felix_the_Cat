@@ -9,7 +9,7 @@ import agent
 DASHBOARD = {
      "NUM_OF_PLAYER": 4,
      
-     "AGENT_MODES": [3, 1, 1, 1], # must be of length NUM_OF_PLAYER
+     "AGENT_MODES": [1, 1, 1, 1], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
@@ -19,7 +19,7 @@ DASHBOARD = {
      # when corresponding AGENT_MODE == 3, "svm"/"nn"/"nb"/"dt"/"lr"
      # else, leave it as ""
 
-     "PRINT_MODE": "g",
+     "PRINT_MODE": "a",
      # a: All / Always
      # g: Gameplay Title and Winning Statistics
      # t: Title
@@ -30,8 +30,8 @@ DASHBOARD = {
      # d: Debug
 
      "NUM_OF_GAME_PLAY": 100,
-     "AUTO_REPLAY": True,
-     "HOLD": False, # hold at the end of the agent function,
+     "AUTO_REPLAY": False,
+     "HOLD": True, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,
      "GAME_RECORD": False
 }
@@ -133,10 +133,10 @@ def handler (agent_input, agent_output):
           elif (my_agent_mode == 3):
                handler_gen1_agent (agent_input, agent_output)
           else:
-               hold = input("ERROR unknown AGENT_MODE: %d." % my_agent_mode)
+               hold = raw_input("ERROR unknown AGENT_MODE: %d." % my_agent_mode)
                exit()
           if (HOLD):
-               hold = input("Press any key to continue...")
+               hold = raw_input("Press any key to continue...")
           printm("OUTPUT DEBUG: ", "d")
           printm(agent_output, "d")
 
@@ -192,7 +192,7 @@ def handler_random_agent (agent_input, agent_output):
           agent_output["card_to_sell"] = card_to_sell
      else: # in Bidding Stage
           min_bid_to_add = agent_input["current_highest_bid"] - current_player["bid"] + 1
-          max_bid_to_add = max(
+          max_bid_to_add = min(
                [
                     agent_input["current_highest_bid"] - current_player["bid"] + agent_input["rule_max_bid"],
                     current_player["token"]
@@ -234,7 +234,7 @@ def handler_gen1_agent (agent_input, agent_output):
                agent_output["bid_to_exceed"] = bid_to_exceed
                agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else 0
      else:
-          hold = input("ERROR unknown agent name: %s." % my_agent_name)
+          hold = raw_input("ERROR unknown agent name: %s." % my_agent_name)
           exit()
 
 ### Game ###
@@ -272,7 +272,7 @@ def play ():
                     AGENT_WAREHOUSE[agent_name]["bid"] = agent.LRAgent(targetType = "bid")
                else:
                     del AGENT_WAREHOUSE[agent_name]
-                    hold = input("ERROR unknown agent name: %s." % agent_name)
+                    hold = raw_input("ERROR unknown agent name: %s." % agent_name)
                
      # Game Rules Set-up #
 
