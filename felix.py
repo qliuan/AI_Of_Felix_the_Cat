@@ -338,7 +338,7 @@ def handler_gen1_agent (agent_input, agent_output):
                placeholder = "s" if (bid_to_add > 1) else ""
                printm("%s AGENT adds %d token%s." % (my_agent_name, bid_to_add, placeholder), "o")
                agent_output["bid_to_exceed"] = bid_to_exceed
-               agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else 0
+               agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else bid_to_add
      else:
           hold = raw_input("ERROR unknown agent name: %s." % my_agent_name)
           exit()
