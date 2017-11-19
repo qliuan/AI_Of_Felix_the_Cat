@@ -8,6 +8,8 @@
 ##			result.txt
 
 import os
+import shutil
+
 
 ## Transform from Boolean T/F to Integer 1/0
 BtoI = {'True': 1, 'False': 0}
@@ -246,5 +248,17 @@ def test():
 	# inputDic['stage'] = 2
 	# decision_printer(inputDic,outputDic)
 
+def clear_raw_data():
+	dataPath = "raw_data"
+	for file in os.listdir(dataPath):
+		# print(file)
+		if not file == "games_played.txt":
+			# print(file)
+			shutil.rmtree(dataPath + "/" +file)
+		else:
+			with open(dataPath + "/" + file, 'w')  as fh:
+				fh.write("0\n0\n0")
+	print("raw_data folder cleared")
+
 if __name__ == '__main__':
-	test()
+	clear_raw_data()
