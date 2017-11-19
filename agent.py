@@ -39,7 +39,7 @@ def check_bid(agent_input, pred):
 	if (pred + cur_high - bid > token): # The token of the player is not enough
 		# Random agent when the model fails
 		result = random.randint(0,token + cur_high - bid)
-		print("bid_random")
+		# print("bid_random")
 
 	# print("Bid result: " + str(result) )
 	return result
@@ -49,7 +49,7 @@ def check_sell(agent_input, pred):
 	decks = agent_input['players_public'][player]['show_deck_public']
 	result = TtoD[str(pred)]
 	if not result in decks:
-		print("\nResult not in decks:")
+		# print("\nResult not in decks:")
 		# print(result)
 		# print(decks)
 		size = len(decks)
@@ -68,10 +68,10 @@ def check_accuracy(target, predict):
 
 	print("Model Accuracy: ")
 	print(float(count)/size)
-	print("Target: ")
-	print(target)
-	print("Predict: ")
-	print(predict)
+	# print("Target: ")
+	# print(target)
+	# print("Predict: ")
+	# print(predict)
 
 # Base class of all agents
 class Agent:
@@ -302,8 +302,8 @@ if __name__ == "__main__":
 	sellAgent = SVMAgent(targetType = "sell")
 	sellAgent.train()
 
-	# bidAgent = SVMAgent(targetType = "bid")
-	# bidAgent.train()
+	bidAgent = SVMAgent(targetType = "bid")
+	bidAgent.train()
 
 	# inputDic = {'my_index': 1,
 	# 	'stage': 1,
