@@ -169,16 +169,16 @@ def decision_recorder(agent_input, agent_output):
 			bidFile.write(
 				"## Decision\n" +
 
-				str(agent_output['bid_to_exceed'] + agent_input['players_public'][player]['bid'] - agent_input['current_highest_bid']) +
+				str(agent_output['bid_to_exceed']) +
 
 				"\n\n" # One Epison ends
 			)
 
-			if agent_output['bid_to_exceed'] > 2:
-				print(agent_input['players_public'][player]['bid'])
-				print(agent_output['bid_to_exceed'])
-				print(agent_input['current_highest_bid'])
-				input("Bid decision problem")
+			# if agent_output['bid_to_exceed'] > 2 or agent_output['bid_to_exceed'] < 0:
+			# 	print(agent_input['players_public'][player]['bid'])
+			# 	print(agent_output['bid_to_exceed'])
+			# 	print(agent_input['current_highest_bid'])
+			# 	input("Bid decision problem")
 
 	return
 

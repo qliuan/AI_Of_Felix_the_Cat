@@ -8,14 +8,14 @@ import agent
 
 DASHBOARD = {
      "NUM_OF_PLAYER": 4,
-     
-     "AGENT_MODES": [2, 1, 3, 3], # must be of length NUM_OF_PLAYER
+
+     "AGENT_MODES": [3, 1, 1, 1], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
      # 3: gen1_agent (svm_agent / nn_agent / nb_agent / dt_agent / lr_agent)
 
-     "AGENT_NAMES": ["", "", "svm", "nb"], # must be of length NUM_OF_PLAYER
+     "AGENT_NAMES": ["svm", "", "svm", "nb"], # must be of length NUM_OF_PLAYER
      # when corresponding AGENT_MODE == 3, "svm"/"nn"/"nb"/"dt"/"lr"
      # else, leave it as ""
 
@@ -29,7 +29,7 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-     "NUM_OF_GAME_PLAY": 100,
+     "NUM_OF_GAME_PLAY": 1000,
      "AUTO_REPLAY": True,
      "HOLD": False, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,
@@ -239,7 +239,7 @@ def handler_naive_agent (agent_input, agent_output):
                "fair": [],
                "bad": []
 
-          } 
+          }
           for card in my_show_deck:
                card_class = card_assessment[card]
                if (card_class not in classified_cards):
@@ -283,7 +283,7 @@ def handler_naive_agent (agent_input, agent_output):
           # Assessment
           if (my_sold_card not in card_assessment):
                print("ERROR unrecognized card: %s." % my_sold_card)
-               exit() 
+               exit()
           assessment = card_assessment[my_sold_card]
           # Bidding Strategy
           bidding_strategy = "" # yearn, stay, skip
@@ -355,7 +355,7 @@ def play ():
      NUM_OF_PLAYER = DASHBOARD["NUM_OF_PLAYER"]
 
      # AGENT_WAREHOUSE Set-up #
-     
+
      for agent_name in DASHBOARD["AGENT_NAMES"]:
           if (agent_name == ""):
                continue
@@ -379,7 +379,7 @@ def play ():
                else:
                     del AGENT_WAREHOUSE[agent_name]
                     hold = raw_input("ERROR unknown agent name: %s." % agent_name)
-               
+
      # Game Rules Set-up #
 
      default_deck_value = { # dictionary <string, int>
@@ -418,7 +418,7 @@ def play ():
      }
 
      # Agent Template Set-up #
-     
+
      agent_input_template = {
           "my_index": -1, # index of current player
           "rule_total_round": total_round,
@@ -463,7 +463,7 @@ def play ():
           # Game Initiation #
 
           current_round = 0
-          starting_player_index = 0
+          starting_player_index = random.randint(0,3)
           players = [] # array of dictionary
           for i in range(num_of_player):
                players.append(player_template.copy())

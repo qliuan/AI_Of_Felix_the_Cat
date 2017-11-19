@@ -31,18 +31,17 @@ def preprocess_feature(X):
 	return X
 
 def check_bid(agent_input, pred):
-	# player = agent_input['my_index']
-	# cur_high = agent_input['current_highest_bid']
-	# bid = agent_input['players_public'][player]['bid']
+	player = agent_input['my_index']
+	cur_high = agent_input['current_highest_bid']
+	bid = agent_input['players_public'][player]['bid']
 	token = agent_input['players_public'][player]['token']
-	# result = cur_high + pred - bid
-	if (pred > token):
+	result = pred
+	if (pred + cur_high - bid > token): # The token of the player is not enough
 		# Random agent when the model fails
-		result = random.randint(0,token)
-	# 	print("bid_random")
+		result = random.randint(0,token + cur_high - bid)
+		print("bid_random")
 
 	# print("Bid result: " + str(result) )
-
 	return result
 
 def check_sell(agent_input, pred):
@@ -50,14 +49,13 @@ def check_sell(agent_input, pred):
 	decks = agent_input['players_public'][player]['show_deck_public']
 	result = TtoD[str(pred)]
 	if not result in decks:
-	# 	print("\nResult not in decks:")
-	# 	print(result)
-	# 	print(decks)
-	# 	size = len(decks)
-	# 	result = decks[random.randint(1,size)-1]
+		print("\nResult not in decks:")
+		# print(result)
+		# print(decks)
+		size = len(decks)
+		result = decks[random.randint(1,size)-1]
 
 	# print("Sell result: " + result)
-
 	# hold = input("Press any key to continue...")
 	return result
 
@@ -68,12 +66,12 @@ def check_accuracy(target, predict):
 		if target[i] == predict[i]:
 			count += 1
 
-	# print("Model Accuracy: ")
-	# print(float(count)/size)
-	# print("Target: ")
-	# print(target)
-	# print("Predict: ")
-	# print(predict)
+	print("Model Accuracy: ")
+	print(float(count)/size)
+	print("Target: ")
+	print(target)
+	print("Predict: ")
+	print(predict)
 
 # Base class of all agents
 class Agent:
@@ -85,9 +83,6 @@ class Agent:
 
 	def predict(self,agent_input):
 		feature = data_parser.parse_input(agent_input)
-		# print "Feature for prediction:\n"
-		# print feature
-		# model = joblib.load(self.modelPath)
 		feature = preprocess_feature(feature)
 		predict = self.model.predict(feature)
 
@@ -122,23 +117,23 @@ class SVMAgent(Agent):
 		test = dataset[numOfTraining:,0:num]	# Test
 		target = dataset[numOfTraining:,num]	# Target
 
-		# X = preprocess_feature(X)
-		# test = preprocess_feature(test)
+		X = preprocess_feature(X)
+		test = preprocess_feature(test)
 		print(X.shape)
 		print(test.shape)
 		# Train the Support Vector Machine model with different classes
 		print("Fitting into model...")
-		model = SVC(kernel = 'linear').fit(X, y)
+		# model = SVC(kernel = 'linear').fit(X, y)
 		# model = SVC(kernel = 'rbf'	 ).fit(X, y)
 
 		# model = NuSVC(kernel = 'linear').fit(X,y)
 		# model = NuSVC(kernel = 'rbf'   ).fit(X,y)
 
-		# model = LinearSVC(multi_class = 'ovr').fit(X,y)
+		model = LinearSVC(multi_class = 'ovr').fit(X,y)
 		# model = LinearSVC(multi_class = 'crammer_singer').fit(X,y)
 
 		# Check model accuracy
-		model.score(test,target)
+		# model.score(test,target)
 		check_accuracy(target, model.predict(test))
 		# Store the model
 		joblib.dump(model, self.modelPath)
@@ -268,29 +263,29 @@ def train_models():
 	sellSVMAgent.train()
 	bidSVMAgent.train()
 
-	print("Training NN model.")
-	sellNNAgent = NNAgent(targetType = "sell")
-	bidNNAgent = NNAgent(targetType = "bid")
-	sellNNAgent.train()
-	bidNNAgent.train()
-
 	print("Training NB model.")
 	sellNBAgent = NBAgent(targetType = "sell")
 	bidNBAgent = NBAgent(targetType = "bid")
 	sellNBAgent.train()
 	bidNBAgent.train()
 
-	print("Training DT model.")
-	sellDTAgent = DTAgent(targetType = "sell")
-	bidDTAgent = DTAgent(targetType = "bid")
-	sellDTAgent.train()
-	bidDTAgent.train()
+	# print("Training NN model.")
+	# sellNNAgent = NNAgent(targetType = "sell")
+	# bidNNAgent = NNAgent(targetType = "bid")
+	# sellNNAgent.train()
+	# bidNNAgent.train()
 
-	print("Training LR model.")
-	sellLRAgent = LRAgent(targetType = "sell")
-	bidLRAgent = LRAgent(targetType = "bid")
-	sellLRAgent.train()
-	bidLRAgent.train()
+	# print("Training DT model.")
+	# sellDTAgent = DTAgent(targetType = "sell")
+	# bidDTAgent = DTAgent(targetType = "bid")
+	# sellDTAgent.train()
+	# bidDTAgent.train()
+
+	# print("Training LR model.")
+	# sellLRAgent = LRAgent(targetType = "sell")
+	# bidLRAgent = LRAgent(targetType = "bid")
+	# sellLRAgent.train()
+	# bidLRAgent.train()
 
 	print("Training of all models done.")
 
@@ -304,10 +299,10 @@ if __name__ == "__main__":
 	# "nb" : "Naive Bayes",
 	# "dt" : "Decision Tree",
 	# "lr" : "Linear Regression"
-	sellAgent = NNAgent(targetType = "sell")
+	sellAgent = SVMAgent(targetType = "sell")
 	sellAgent.train()
 
-	# bidAgent = NNAgent(targetType = "bid")
+	# bidAgent = SVMAgent(targetType = "bid")
 	# bidAgent.train()
 
 	# inputDic = {'my_index': 1,

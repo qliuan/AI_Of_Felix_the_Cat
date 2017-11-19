@@ -40,11 +40,17 @@ def parse_file(rawDataFile, dataFile):
 	raw  = open(rawDataFile, 'r')
 
 	while(True):
+		skip = False
 		text = raw.readline()
-		# print "Text: " + text # text = "## Round information\n"
+		# text = "## Round information\n"
 		if text == '':
 			break
 		episode = raw.readline().rstrip() + " "
+
+		# if (episode.split(" ")[1] != "9"):
+		# 	# print("Skipping round " + episode.split(" ")[1] )
+		# 	skip = True
+
 		raw.readline() # "## Player information\n"
 		episode += raw.readline().rstrip() + " "
 		episode += raw.readline().rstrip() + " "
@@ -57,6 +63,9 @@ def parse_file(rawDataFile, dataFile):
 
 		# print "Episode Done:\n" + episode
 		# raw_input('Enter your input:')
+		if (skip):
+			continue
+
 		data.write(episode)
 
 def empty_data(path):
