@@ -9,13 +9,13 @@ import agent
 DASHBOARD = {
      "NUM_OF_PLAYER": 4,
 
-     "AGENT_MODES": [3, 1, 1, 1], # must be of length NUM_OF_PLAYER
+     "AGENT_MODES": [3, 2, 1, 1], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
      # 3: gen1_agent (svm_agent / nn_agent / nb_agent / dt_agent / lr_agent)
 
-     "AGENT_NAMES": ["svm", "", "svm", "nb"], # must be of length NUM_OF_PLAYER
+     "AGENT_NAMES": ["svm", "svm", "svm", "nb"], # must be of length NUM_OF_PLAYER
      # when corresponding AGENT_MODE == 3, "svm"/"nn"/"nb"/"dt"/"lr"
      # else, leave it as ""
 
