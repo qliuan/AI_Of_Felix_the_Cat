@@ -9,7 +9,7 @@ import agent
 DASHBOARD = {
      "NUM_OF_PLAYER": 4,
 
-     "AGENT_MODES": [3, 1, 1, 1], # must be of length NUM_OF_PLAYER
+     "AGENT_MODES": [3, 2, 1, 1], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
