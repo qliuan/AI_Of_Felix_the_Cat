@@ -29,7 +29,7 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-     "NUM_OF_GAME_PLAY": 100,
+     "NUM_OF_GAME_PLAY": 1000,
      "AUTO_REPLAY": True,
      "HOLD": False, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,

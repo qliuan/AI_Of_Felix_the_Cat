@@ -163,12 +163,19 @@ class DeepQNetwork:
             sample_index = np.random.choice(self.memory_counter, size=self.batch_size)
         batch_memory = self.memory[sample_index, :]
 
+        # get the results from two nns
         q_next, q_eval = self.sess.run(
             [self.q_next, self.q_eval],
             feed_dict={
                 self.s_: batch_memory[:, -self.n_features:],  # fixed params
                 self.s: batch_memory[:, :self.n_features],  # newest params
             })
+
+        # print("q_next: ")
+        # print(q_next)
+        # print("q_eval: ")
+        # print(q_eval)
+        # input("Pause")
 
         # change q_target w.r.t q_eval's action
         q_target = q_eval.copy()
@@ -214,6 +221,18 @@ class DeepQNetwork:
         # increasing epsilon
         self.epsilon = self.epsilon + self.epsilon_increment if self.epsilon < self.epsilon_max else self.epsilon_max
         self.learn_step_counter += 1
+
+    def save(self):
+        print("\nSave the model...")
+        saver = tf.train.Saver()
+        saver.save(self.sess,"DQN_model/save_net.ckpt")
+        print("Done\n")
+
+    def load(self):
+        print("\nLoading the model...")
+        # To be continued
+        print("Done\n")
+
 
     def plot_cost(self):
         import matplotlib.pyplot as plt
