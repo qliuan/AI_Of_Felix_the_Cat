@@ -150,6 +150,93 @@ def test():
 	inputDic['stage'] = 2
 	parse_input(inputDic)
 
+
+def rl_parse_raw_data():
+	rawDataPath = "raw_data"
+	sellingDataPath = "rlsellingData.txt"
+	biddingDataPath = "rlbiddingData.txt"
+	empty_data(biddingDataPath)
+	empty_data(sellingDataPath)
+
+	for folder in os.listdir(rawDataPath):
+		if '.' in folder: # Skip "result.txt" and files starting with "."
+			continue
+		folderPath = rawDataPath + "/" + folder
+		resultPath = folderPath + "/result.txt"
+		with open(resultPath, 'r') as resultFile:
+			winner = resultFile.readline().rstrip() # Get the winner index
+
+		for playerInd in range(4):
+			isWinner = True if playerInd==winner else False
+			playerPath = folderPath + "/player" + str(playerInd)
+			sellingPath = playerPath + "/selling.txt"
+			biddingPath = playerPath + "/bidding.txt"
+
+			# print "SellingPath: " + sellingPath
+			# print "BiddingPath: " + biddingPath
+
+			# Handling the parsing of selling data
+			rl_parse_file(sellingPath, sellingDataPath, isWinner)
+
+			# Handling the parsing of selling data
+			# rl_parse_file(biddingPath, biddingDataPath, isWinner)
+
+def rl_parse_file(rawDataFile, dataFile, isWinner):
+	data = open(dataFile, 'a')
+	raw  = open(rawDataFile, 'r')
+
+	while(True):
+		#---- State ----#
+		text = raw.readline()
+		# text = "## Round information\n"
+		if text == '':
+			break
+		roundNum = raw.readline().rstrip() + " "
+
+		raw.readline() # "## Player information\n"
+		playerInd = raw.readline().rstrip() + " "
+		playerInfo = []
+		playerInfo.append( raw.readline().rstrip() + " " )
+		playerInfo.append( raw.readline().rstrip() + " " )
+		playerInfo.append( raw.readline().rstrip() + " " )
+		playerInfo.append( raw.readline().rstrip() + " " )
+		raw.readline() # "## Decision"
+
+		state = roundNum + playerInd + playerInfo[0] + playerInfo[1] + playerInfo[2] + playerInfo[3]
+
+		# print("State:\n" + state)
+
+		#---- Action ----#
+		action = raw.readline().rstrip() + " "
+		raw.readline() # "\n"
+
+		# print("Action:\n" + action)
+
+		#---- Reward ----#
+		reward = "1\n" if isWinner else "0\n"
+
+		# print("Reward:\n" + reward)
+
+		#---- Next State ----#
+		if "sell" in dataFile:
+			cardInd = int(action)
+			cardList = playerInfo[int(playerInd)].split(' ')
+			cardList[2+cardInd] = '0'
+			playerInfo[int(playerInd)] = " ".join(cardList)
+			nextState = roundNum + playerInd + playerInfo[0] + playerInfo[1] + playerInfo[2] + playerInfo[3]
+
+			# print("Next State:\n" + nextState)
+			# input("sell")
+
+		else:
+			input("bid")
+
+
+
+		episode = state + nextState + action + reward
+		data.write(episode)
+
 if __name__ == '__main__':
 	# parse_raw_data()
-	test()
+	# test()
+	rl_parse_raw_data()
