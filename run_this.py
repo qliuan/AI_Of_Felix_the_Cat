@@ -1,6 +1,8 @@
 from maze_env import Maze
 from RL_brain import DeepQNetwork
 
+SELL_ACTIONS = 1
+SELL_FEATURES = 51
 
 def run_maze():
     step = 0
@@ -20,6 +22,16 @@ def run_maze():
 
             RL.store_transition(observation, action, reward, observation_)
 
+            # print("Type of obse: " + str(type(observation))+ " Shape: " + str(observation.shape) )
+            # print(observation)
+            # print("Type of action: " + str(type(action)) + " Shape: " + str(action.shape))
+            # print(action)
+            # print("Type of reward: " + str(type(reward)))
+            # print(reward)
+            # print("Type of obse_: " + str(type(observation_)) + " Shape: " + str(observation_.shape))
+            # print(observation_)
+            # input("Shape")
+
             if (step > 200) and (step % 5 == 0):
                 RL.learn()
 
@@ -34,6 +46,7 @@ def run_maze():
     # end of game
     print('game over')
     env.destroy()
+
 
 
 if __name__ == "__main__":

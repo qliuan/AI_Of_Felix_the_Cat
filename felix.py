@@ -9,7 +9,7 @@ import agent
 DASHBOARD = {
      "NUM_OF_PLAYER": 4,
 
-     "AGENT_MODES": [3, 1, 1, 1], # must be of length NUM_OF_PLAYER
+     "AGENT_MODES": [1, 1, 1, 1], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
@@ -29,11 +29,11 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-     "NUM_OF_GAME_PLAY": 1000,
+     "NUM_OF_GAME_PLAY": 100,
      "AUTO_REPLAY": True,
      "HOLD": False, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,
-     "GAME_RECORD": False
+     "GAME_RECORD": True
 }
 
 WIN_COUNTS = []

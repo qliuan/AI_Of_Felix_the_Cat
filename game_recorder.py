@@ -254,7 +254,10 @@ def clear_raw_data():
 		# print(file)
 		if not file == "games_played.txt":
 			# print(file)
-			shutil.rmtree(dataPath + "/" +file)
+			try:
+				shutil.rmtree(dataPath + "/" +file)
+			except:
+				os.remove(dataPath + "/" +file)
 		else:
 			with open(dataPath + "/" + file, 'w')  as fh:
 				fh.write("0\n0\n0")

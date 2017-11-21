@@ -162,6 +162,7 @@ def rl_parse_raw_data():
 		if '.' in folder: # Skip "result.txt" and files starting with "."
 			continue
 		folderPath = rawDataPath + "/" + folder
+		print("Parsing " + folderPath)
 		resultPath = folderPath + "/result.txt"
 		with open(resultPath, 'r') as resultFile:
 			winner = resultFile.readline().rstrip() # Get the winner index
@@ -213,7 +214,7 @@ def rl_parse_file(rawDataFile, dataFile, isWinner):
 		# print("Action:\n" + action)
 
 		#---- Reward ----#
-		reward = "1\n" if isWinner else "0\n"
+		reward = "1 " if isWinner else "0 "
 
 		# print("Reward:\n" + reward)
 
@@ -223,7 +224,7 @@ def rl_parse_file(rawDataFile, dataFile, isWinner):
 			cardList = playerInfo[int(playerInd)].split(' ')
 			cardList[2+cardInd] = '0'
 			playerInfo[int(playerInd)] = " ".join(cardList)
-			nextState = roundNum + playerInd + playerInfo[0] + playerInfo[1] + playerInfo[2] + playerInfo[3]
+			nextState = roundNum + playerInd + playerInfo[0] + playerInfo[1] + playerInfo[2] + playerInfo[3].rstrip()
 
 			# print("Next State:\n" + nextState)
 			# input("sell")
@@ -233,7 +234,7 @@ def rl_parse_file(rawDataFile, dataFile, isWinner):
 
 
 
-		episode = state + nextState + action + reward
+		episode = state + action + reward + nextState + "\n"
 		data.write(episode)
 
 if __name__ == '__main__':
