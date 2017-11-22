@@ -168,7 +168,7 @@ def rl_parse_raw_data():
 			winner = resultFile.readline().rstrip() # Get the winner index
 
 		for playerInd in range(4):
-			isWinner = True if playerInd==winner else False
+			isWinner = True if playerInd==int(winner) else False
 			playerPath = folderPath + "/player" + str(playerInd)
 			sellingPath = playerPath + "/selling.txt"
 			biddingPath = playerPath + "/bidding.txt"
@@ -215,6 +215,8 @@ def rl_parse_file(rawDataFile, dataFile, isWinner):
 
 		#---- Reward ----#
 		reward = "1 " if isWinner else "0 "
+		if isWinner and reward != "1 ":
+			input("error")
 
 		# print("Reward:\n" + reward)
 

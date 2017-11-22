@@ -31,8 +31,6 @@ def train_from_data():
 	return
 
 
-
-
 def test():
 	RL.load()
 

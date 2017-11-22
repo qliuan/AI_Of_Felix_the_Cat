@@ -3,9 +3,10 @@
 ## raw_data
 ##		games_played.txt
 ##		game1
-##			selling.txt
-##			bidding.txt
-##			result.txt
+##			player1
+##				selling.txt
+##				bidding.txt
+##				result.txt
 
 import os
 import shutil
