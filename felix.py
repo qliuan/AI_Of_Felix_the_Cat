@@ -8,14 +8,14 @@ import rl_agent
 DASHBOARD = {
      "NUM_OF_PLAYER": 4,
 
-     "AGENT_MODES": [1, 1, 1, 1], # must be of length NUM_OF_PLAYER
+     "AGENT_MODES": [4, 1, 1, 1], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
      # 3: gen1_agent (svm_agent / nn_agent / nb_agent / dt_agent / lr_agent)
      # 4: rl_agent
 
-     "AGENT_NAMES": ["rl", "svm", "rl", "nb"], # must be of length NUM_OF_PLAYER
+     "AGENT_NAMES": ["rl", "rl", "rl", "rl"], # must be of length NUM_OF_PLAYER
      # when corresponding AGENT_MODE == 3, "svm"/"nn"/"nb"/"dt"/"lr"
      # when corresponding AGENT_MODE == 4, "rl"
      # else, leave it as ""

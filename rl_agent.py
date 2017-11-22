@@ -266,7 +266,8 @@ def get_agent():
     RL.load()
     return RL
 
-def train_from_data():
+
+def train_from_data(RL):
     rldataPath = "rlsellingData.txt"
 
     with open(rldataPath, 'r') as file:
@@ -294,14 +295,36 @@ def train_from_data():
     RL.save()
     return
 
-if __name__ == "__main__":
-
-    # Parse the data properly
-    data_parser.rl_parse_raw_data()
-
-    RL = get_agent()
-
-    train_from_data()
+def restart_model():
+    RL = DeepQNetwork(SELL_ACTIONS, SELL_FEATURES,
+                      learning_rate=0.01,
+                      reward_decay=0.9,
+                      e_greedy=0.9,
+                      replace_target_iter=200,
+                      memory_size=2000,
+                      output_graph=False
+                      )
+    train_from_data(RL)
+    RL.save()
+    print("The model has been\n")
+    print("Restarted!!\n\n")
 
     print("Displaying the cost...")
     RL.plot_cost()
+
+
+def main():
+    RL = get_agent()
+
+    train_from_data(RL)
+
+    print("Displaying the cost...")
+    RL.plot_cost()
+
+if __name__ == "__main__":
+    # Parse the data properly
+    data_parser.rl_parse_raw_data()
+    main()
+    # restart_model()
+
+
