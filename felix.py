@@ -2,6 +2,7 @@ import random
 import ast #ast.literal_eval
 import game_recorder # recording decisions
 import agent
+import RL_brain
 
 # TO-DOs
 # 1. design naive agent
@@ -9,14 +10,16 @@ import agent
 DASHBOARD = {
      "NUM_OF_PLAYER": 4,
 
-     "AGENT_MODES": [1, 1, 1, 1], # must be of length NUM_OF_PLAYER
+     "AGENT_MODES": [1, 4, 1, 1], # must be of length NUM_OF_PLAYER
      # 0: manual
      # 1: random_agent
      # 2: naive_agent
      # 3: gen1_agent (svm_agent / nn_agent / nb_agent / dt_agent / lr_agent)
+     # 4: rl_agent
 
-     "AGENT_NAMES": ["svm", "", "svm", "nb"], # must be of length NUM_OF_PLAYER
+     "AGENT_NAMES": ["svm", "rl", "svm", "nb"], # must be of length NUM_OF_PLAYER
      # when corresponding AGENT_MODE == 3, "svm"/"nn"/"nb"/"dt"/"lr"
+     # when corresponding AGENT_MODE == 4, "rl"
      # else, leave it as ""
 
      "PRINT_MODE": "g",
@@ -29,11 +32,11 @@ DASHBOARD = {
      # r: Game Result
      # d: Debug
 
-     "NUM_OF_GAME_PLAY": 1000,
+     "NUM_OF_GAME_PLAY": 10,
      "AUTO_REPLAY": True,
      "HOLD": False, # hold at the end of the agent function,
      "WIN_RATE_COUNT": True,
-     "GAME_RECORD": True
+     "GAME_RECORD": False
 }
 
 WIN_COUNTS = []
@@ -132,6 +135,8 @@ def handler (agent_input, agent_output):
                handler_naive_agent (agent_input, agent_output)
           elif (my_agent_mode == 3):
                handler_gen1_agent (agent_input, agent_output)
+          elif (my_agent_mode == 4):
+               handler_rl_agent (agent_input, agent_output)
           else:
                hold = raw_input("ERROR unknown AGENT_MODE: %d." % my_agent_mode)
                exit()
@@ -343,6 +348,28 @@ def handler_gen1_agent (agent_input, agent_output):
           hold = raw_input("ERROR unknown agent name: %s." % my_agent_name)
           exit()
 
+def handler_rl_agent (agent_input, agent_output):
+     my_index = agent_input["my_index"]
+     my_agent_name = DASHBOARD["AGENT_NAMES"][my_index]
+     current_player = agent_input["players_public"][agent_input["my_index"]]
+     stage = agent_input["stage"]
+     if (my_agent_name in AGENT_WAREHOUSE):
+          if (stage == 1): # in Selling Stage
+               card_to_sell = AGENT_WAREHOUSE[my_agent_name]["sell"].choose_action(agent_input)
+               printm("%s AGENT sells %s." % (my_agent_name, card_to_sell), "o")
+               agent_output["card_to_sell"] = card_to_sell
+          else: # in Bidding Stage
+               handler_random_agent (agent_input, agent_output)
+               # bid_to_exceed = AGENT_WAREHOUSE[my_agent_name]["bid"].predict(agent_input)
+               # bid_to_add = 0 if (bid_to_exceed == 0) else (bid_to_exceed + agent_input["current_highest_bid"] - current_player["bid"])
+               # placeholder = "s" if (bid_to_add > 1) else ""
+               # printm("%s AGENT adds %d token%s." % (my_agent_name, bid_to_add, placeholder), "o")
+               # agent_output["bid_to_exceed"] = bid_to_exceed
+               # agent_output["bid_to_add"] = 0 if (bid_to_exceed == 0) else bid_to_add
+     else:
+          hold = raw_input("ERROR unknown agent name: %s." % my_agent_name)
+          exit()
+
 ### Game ###
 
 def play ():
@@ -376,6 +403,9 @@ def play ():
                elif (agent_name == "lr"):
                     AGENT_WAREHOUSE[agent_name]["sell"] = agent.LRAgent(targetType = "sell")
                     AGENT_WAREHOUSE[agent_name]["bid"] = agent.LRAgent(targetType = "bid")
+               elif (agent_name == "rl"):
+                    AGENT_WAREHOUSE[agent_name]["sell"] = RL_brain.get_agent()
+                    AGENT_WAREHOUSE[agent_name]["bid"] = agent.SVMAgent(targetType = "bid")
                else:
                     del AGENT_WAREHOUSE[agent_name]
                     hold = raw_input("ERROR unknown agent name: %s." % agent_name)

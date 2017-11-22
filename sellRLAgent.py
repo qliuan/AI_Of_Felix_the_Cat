@@ -30,15 +30,39 @@ def train_from_data():
 	RL.save()
 	return
 
+
+
+
 def test():
 	RL.load()
-	input("test")
+
+	inputDic = {'my_index': 1,
+		'stage': 1,
+		'current_highest_bid': 8,
+		'starting_player_index': 3,
+		'round': 2,
+		'central_series_public': ['*', '*', '*', '*'],
+		'reward_pointer': 2,
+		'players_public':
+		[
+		{'token': 4, 'skipped': False, 'score': 20, 'bid': 0, 'show_deck_public': ['+3', '+11', 'dog', 'DOG', '-5', '0', '+5', '+8', '-8']},
+		{'token': 15, 'skipped': False, 'score': 0, 'bid': 0, 'show_deck_public': ['+3', '+11', '+15', 'dog', '-5', '0', '+5', '+8', '-8']},
+		{'token': 15, 'skipped': False, 'score': 0, 'bid': 0, 'show_deck_public': ['+3', '+11', '+15', 'dog', 'DOG', '-5', '0', '+5', '+8']},
+		{'token': 15, 'skipped': False, 'score': 0, 'bid': 0, 'show_deck_public': ['+3', '+11', '+15', 'dog', 'DOG', '-5', '+5', '+8', '-8']}
+		]
+	}
+
+	action = decide(inputDic)
+
+	print(action)
+	input("Testing Action")
+
 
 
 if __name__ == "__main__":
 
     # Parse the data properly
-	data_parser.rl_parse_raw_data()
+	# data_parser.rl_parse_raw_data()
 
 	RL = DeepQNetwork(SELL_ACTIONS, SELL_FEATURES,
                       learning_rate=0.01,
@@ -49,7 +73,7 @@ if __name__ == "__main__":
                       output_graph=False
                       )
 
-	# test()
+	test()
 
 	train_from_data()
 

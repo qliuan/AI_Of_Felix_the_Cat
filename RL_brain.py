@@ -13,10 +13,25 @@ gym: 0.7.3
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import data_parser
 
 np.random.seed(1)
 tf.set_random_seed(1)
 
+SELL_ACTIONS = 10
+SELL_FEATURES = 51
+
+def get_agent():
+    RL = DeepQNetwork(SELL_ACTIONS, SELL_FEATURES,
+                      learning_rate=0.01,
+                      reward_decay=0.9,
+                      e_greedy=0.9,
+                      replace_target_iter=200,
+                      memory_size=2000,
+                      output_graph=False
+                      )
+    RL.load()
+    return RL
 
 # Deep Q Network off-policy
 class DeepQNetwork:
@@ -138,7 +153,10 @@ class DeepQNetwork:
 
         self.memory_counter += 1
 
-    def choose_action(self, observation):
+    def choose_action(self, agent_input):
+        feature = data_parser.parse_input(agent_input)
+        observation = feature.astype(int)
+        observation = np.reshape(observation, -1)
         # to have batch dimension when feed into tf placeholder
         observation = observation[np.newaxis, :]
 
@@ -219,9 +237,9 @@ class DeepQNetwork:
     def save(self):
         print("\nSave the model...")
 
-        vari = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
-        print(vari)
-        input("hold")
+        # vari = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+        # print(vari)
+        # input("hold")
 
         saver = tf.train.Saver()
         saver.save(self.sess,"DQN_model/save_net.ckpt")
@@ -229,30 +247,10 @@ class DeepQNetwork:
 
     def load(self):
         print("\nLoading the model...")
-        # To be continued
-        # c_names(collections_names) are the collections to store variables
-        c_names, n_l1, w_initializer, b_initializer = \
-            ['eval_net_params', tf.GraphKeys.GLOBAL_VARIABLES], 10, \
-            tf.random_normal_initializer(0., 0.3), tf.constant_initializer(0.1)  # config of layers
-
-        # first layer. collections is used later when assign to target net
-        w1 = tf.get_variable('w1', [self.n_features, n_l1], initializer=w_initializer, collections=c_names)
-        b1 = tf.get_variable('b1', [1, n_l1], initializer=b_initializer, collections=c_names)
-        # l1 = tf.nn.relu(tf.matmul(self.s, w1) + b1)
-
-        # second layer. collections is used later when assign to target net
-        w2 = tf.get_variable('w2', [n_l1, self.n_actions], initializer=w_initializer, collections=c_names)
-        b2 = tf.get_variable('b2', [1, self.n_actions], initializer=b_initializer, collections=c_names)
-        # self.q_eval = tf.matmul(l1, w2) + b2
 
         # Restore variables from disk.
         saver = tf.train.Saver()
         saver.restore(self.sess, "DQN_model/save_net.ckpt")
-
-        print(w1)
-        print(b1)
-        print(w2)
-        print(b2)
 
         print("Done\n")
 
