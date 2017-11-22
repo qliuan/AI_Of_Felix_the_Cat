@@ -111,22 +111,22 @@ class DeepQNetwork:
                 b2 = tf.get_variable('b2', [1, self.n_actions], initializer=b_initializer, collections=c_names)
                 self.q_next = tf.matmul(l1, w2) + b2
 
-    def store_transition(self, s, a, r, s_):
-        if not hasattr(self, 'memory_counter'):
-            self.memory_counter = 0
+    # def store_transition(self, s, a, r, s_):
+    #     if not hasattr(self, 'memory_counter'):
+    #         self.memory_counter = 0
 
-        print(str(s.shape) + " " + str(a.shape) + " " + str(s_.shape))
-        print([a])
-        print([r])
-        transition = np.hstack((s, [a, r], s_))
-        print(transition.shape)
-        input("Stop")
+    #     print(str(s.shape) + " " + str(a.shape) + " " + str(s_.shape))
+    #     print([a])
+    #     print([r])
+    #     transition = np.hstack((s, [a, r], s_))
+    #     print(transition.shape)
+    #     input("Stop")
 
-        # replace the old memory with new memory
-        index = self.memory_counter % self.memory_size
-        self.memory[index, :] = transition
+    #     # replace the old memory with new memory
+    #     index = self.memory_counter % self.memory_size
+    #     self.memory[index, :] = transition
 
-        self.memory_counter += 1
+    #     self.memory_counter += 1
 
     def store_transition(self, transition):
         if not hasattr(self, 'memory_counter'):
@@ -170,12 +170,6 @@ class DeepQNetwork:
                 self.s_: batch_memory[:, -self.n_features:],  # fixed params
                 self.s: batch_memory[:, :self.n_features],  # newest params
             })
-
-        # print("q_next: ")
-        # print(q_next)
-        # print("q_eval: ")
-        # print(q_eval)
-        # input("Pause")
 
         # change q_target w.r.t q_eval's action
         q_target = q_eval.copy()
@@ -224,6 +218,11 @@ class DeepQNetwork:
 
     def save(self):
         print("\nSave the model...")
+
+        vari = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+        print(vari)
+        input("hold")
+
         saver = tf.train.Saver()
         saver.save(self.sess,"DQN_model/save_net.ckpt")
         print("Done\n")
@@ -231,6 +230,30 @@ class DeepQNetwork:
     def load(self):
         print("\nLoading the model...")
         # To be continued
+        # c_names(collections_names) are the collections to store variables
+        c_names, n_l1, w_initializer, b_initializer = \
+            ['eval_net_params', tf.GraphKeys.GLOBAL_VARIABLES], 10, \
+            tf.random_normal_initializer(0., 0.3), tf.constant_initializer(0.1)  # config of layers
+
+        # first layer. collections is used later when assign to target net
+        w1 = tf.get_variable('w1', [self.n_features, n_l1], initializer=w_initializer, collections=c_names)
+        b1 = tf.get_variable('b1', [1, n_l1], initializer=b_initializer, collections=c_names)
+        # l1 = tf.nn.relu(tf.matmul(self.s, w1) + b1)
+
+        # second layer. collections is used later when assign to target net
+        w2 = tf.get_variable('w2', [n_l1, self.n_actions], initializer=w_initializer, collections=c_names)
+        b2 = tf.get_variable('b2', [1, self.n_actions], initializer=b_initializer, collections=c_names)
+        # self.q_eval = tf.matmul(l1, w2) + b2
+
+        # Restore variables from disk.
+        saver = tf.train.Saver()
+        saver.restore(self.sess, "DQN_model/save_net.ckpt")
+
+        print(w1)
+        print(b1)
+        print(w2)
+        print(b2)
+
         print("Done\n")
 
 
