@@ -18,3 +18,10 @@ The directory tree for recording the data
 	## game2
 	...
 	## gameN
+
+
+Train Reinforcement Learning Model
+Step 1: call game_recorder.py to clear former data
+Step 2: set the parameters in felix.py and run it to get new data
+Step 3: run rl_agent.py to train the model and display the cost curve
+Step 4: run felix.py to check the winning rate
