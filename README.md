@@ -22,14 +22,14 @@ Explain how to get the system running
 ### Before each run
 
 The testing settings are all included in the begining of "felix.py", so check the settings before running is required.
-
+```
 (1) check the settings in the beginning of the file "felix.py".
 (2) “Num_OF_PLAYER” is typically set to be 4, since the original game is for 4 gamers.
 (3) “AGENT_MODES” stores the types of agents for each player you wish to assign.
 (4) “AGENT_NAMES” stores the names of explicit agents to use for each player.
 (5) “PRINT_MODE” decides what information to be printed.
 (6) “GAME_RECORD” decides whether we store all the game information for later training.
-
+```
 
 ### Running examples
 
