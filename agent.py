@@ -305,21 +305,21 @@ if __name__ == "__main__":
 	bidAgent = SVMAgent(targetType = "bid")
 	bidAgent.train()
 
-	inputDic = {'my_index': 1,
-		'stage': 1,
-		'current_highest_bid': 8,
-		'starting_player_index': 3,
-		'round': 4,
-		'central_series_public': ['+8', 'DOG', '-5', '+15'],
-		'reward_pointer': 2,
-		'players_public':
-		[
-		{'token': 4, 'skipped': True, 'score': 20, 'bid': 0, 'show_deck_public': ['+3', '+11', 'dog', 'DOG', '-5', '0', '+5', '+8', '-8']},
-		{'token': 15, 'skipped': False, 'score': 0, 'bid': 4, 'show_deck_public': ['+3', '+11', '+15', 'dog', '-5', '0', '+5', '+8', '-8']},
-		{'token': 15, 'skipped': False, 'score': 0, 'bid': 8, 'show_deck_public': ['+3', '+11', '+15', 'dog', 'DOG', '-5', '0', '+5', '+8']},
-		{'token': 15, 'skipped': False, 'score': 0, 'bid': 6, 'show_deck_public': ['+3', '+11', '+15', 'dog', 'DOG', '-5', '+5', '+8', '-8']}
-		]
-	}
+	# inputDic = {'my_index': 1,
+	# 	'stage': 1,
+	# 	'current_highest_bid': 8,
+	# 	'starting_player_index': 3,
+	# 	'round': 4,
+	# 	'central_series_public': ['+8', 'DOG', '-5', '+15'],
+	# 	'reward_pointer': 2,
+	# 	'players_public':
+	# 	[
+	# 	{'token': 4, 'skipped': True, 'score': 20, 'bid': 0, 'show_deck_public': ['+3', '+11', 'dog', 'DOG', '-5', '0', '+5', '+8', '-8']},
+	# 	{'token': 15, 'skipped': False, 'score': 0, 'bid': 4, 'show_deck_public': ['+3', '+11', '+15', 'dog', '-5', '0', '+5', '+8', '-8']},
+	# 	{'token': 15, 'skipped': False, 'score': 0, 'bid': 8, 'show_deck_public': ['+3', '+11', '+15', 'dog', 'DOG', '-5', '0', '+5', '+8']},
+	# 	{'token': 15, 'skipped': False, 'score': 0, 'bid': 6, 'show_deck_public': ['+3', '+11', '+15', 'dog', 'DOG', '-5', '+5', '+8', '-8']}
+	# 	]
+	# }
 
 	# outputDic = {'card_to_sell': 'DOG', 'bid_to_add': 2}
 
