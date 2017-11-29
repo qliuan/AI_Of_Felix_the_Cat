@@ -117,23 +117,6 @@ class DeepQNetwork:
                 b2 = tf.get_variable('b2', [1, self.n_actions], initializer=b_initializer, collections=c_names)
                 self.q_next = tf.matmul(l1, w2) + b2
 
-    # def store_transition(self, s, a, r, s_):
-    #     if not hasattr(self, 'memory_counter'):
-    #         self.memory_counter = 0
-
-    #     print(str(s.shape) + " " + str(a.shape) + " " + str(s_.shape))
-    #     print([a])
-    #     print([r])
-    #     transition = np.hstack((s, [a, r], s_))
-    #     print(transition.shape)
-    #     input("Stop")
-
-    #     # replace the old memory with new memory
-    #     index = self.memory_counter % self.memory_size
-    #     self.memory[index, :] = transition
-
-    #     self.memory_counter += 1
-
     def store_transition(self, transition):
         if not hasattr(self, 'memory_counter'):
             self.memory_counter = 0

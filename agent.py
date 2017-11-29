@@ -123,6 +123,7 @@ class SVMAgent(Agent):
 		print(test.shape)
 		# Train the Support Vector Machine model with different classes
 		print("Fitting into model...")
+
 		# model = SVC(kernel = 'linear').fit(X, y)
 		# model = SVC(kernel = 'rbf'	 ).fit(X, y)
 
@@ -132,7 +133,6 @@ class SVMAgent(Agent):
 		model = LinearSVC(multi_class = 'ovr').fit(X,y)
 		# model = LinearSVC(multi_class = 'crammer_singer').fit(X,y)
 
-		# Check model accuracy
 		# model.score(test,target)
 		check_accuracy(target, model.predict(test))
 		# Store the model
